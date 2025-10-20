@@ -1,0 +1,27 @@
+-- Migration number: 0002 	 2025-10-19T10:00:00.000Z
+CREATE TABLE IF NOT EXISTS lojas (
+    idloja INTEGER PRIMARY KEY NOT NULL,
+    banco TEXT,
+    BACKUP TEXT,
+    loja TEXT,
+    ultimoerrorelicar TEXT,
+    ultimoerrointegracao TEXT,
+    qdtregistrosreplicar INTEGER,
+    replicar INTEGER,
+    reglocal INTEGER,
+    regservidor INTEGER,
+    versaosinc TEXT,
+    tempogastoreplicar INTEGER,
+    regintegracao INTEGER,
+    versaol TEXT,
+    versaopro TEXT,
+    versaoomnni TEXT,
+    versaolite TEXT,
+    versaoparelelo TEXT,
+    versaodunamis TEXT,
+    versaointegracao TEXT,
+    versaoatualizador TEXT,
+    versaotemp TEXT,
+    ipvpn TEXT,
+    integracao INTEGER
+);
