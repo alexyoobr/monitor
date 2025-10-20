@@ -115,8 +115,6 @@
 </head>
 <body>
     <div class="container">
-        <h1>Dashboard de Lojas</h1>
-        
         <!-- Filtros -->
         <div class="filters">
             <div class="filter-row">
@@ -257,7 +255,18 @@
         }
         
         // Carregar os dados quando a página for carregada
-        document.addEventListener('DOMContentLoaded', loadLojas);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLojas();
+            const input = document.getElementById('searchFilter');
+            if (input) {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        applyFilters();
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
