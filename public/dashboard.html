@@ -364,17 +364,18 @@
                 const hasErrors = erroReplicar || erroIntegracao;
                 if (hasRegs && hasErrors) {
                     row.classList.add('row-alert');
-                }
-                // Destacar em azul quando 'replicar' estiver mais de 1 hora atrás do agora
-                const replicarStr = (typeof loja.replicar === 'string') ? loja.replicar.trim() : '';
-                if (replicarStr) {
-                    const isoStr = replicarStr.replace(' ', 'T') + '-03:00';
-                    const replicarDate = new Date(isoStr);
-                    if (!isNaN(replicarDate.getTime())) {
-                        const diffMs = Date.now() - replicarDate.getTime();
-                        const oneHourMs = 60 * 60 * 1000;
-                        if (diffMs > oneHourMs) {
-                            row.classList.add('row-replicar-old');
+                } else {
+                    // Destacar em azul quando 'replicar' estiver mais de 1 hora atrás do agora
+                    const replicarStr = (typeof loja.replicar === 'string') ? loja.replicar.trim() : '';
+                    if (replicarStr) {
+                        const isoStr = replicarStr.replace(' ', 'T') + '-03:00';
+                        const replicarDate = new Date(isoStr);
+                        if (!isNaN(replicarDate.getTime())) {
+                            const diffMs = Date.now() - replicarDate.getTime();
+                            const oneHourMs = 60 * 60 * 1000;
+                            if (diffMs > oneHourMs) {
+                                row.classList.add('row-replicar-old');
+                            }
                         }
                     }
                 }
