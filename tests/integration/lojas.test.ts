@@ -57,7 +57,7 @@ describe("Loja API Integration Tests", () => {
       const lojaData = {
         banco: "New Banco",
         idloja: 1,
-        BACKUP: "Backup Info",
+        backup: "2025-10-20", // Alterado de BACKUP para backup e formato para data
         loja: "New Loja",
         ultimoerrorelicar: "No errors",
         ultimoerrointegracao: "No errors",
@@ -228,6 +228,7 @@ describe("Loja API Integration Tests", () => {
 
       const updatedData = {
         loja: "Updated Loja",
+        backup: "2025-10-21", // Alterado de BACKUP para backup e formato para data
         replicar: "2025-10-20 11:00:00",
         integracao: 0,
       };

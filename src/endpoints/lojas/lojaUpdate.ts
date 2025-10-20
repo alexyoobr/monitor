@@ -7,7 +7,7 @@ export class LojaUpdate extends D1UpdateEndpoint<HandleArgs> {
     model: LojaModel,
     fields: LojaModel.schema.pick({
       // Excluir banco e idloja dos campos atualizáveis pois são parte da chave primária
-      BACKUP: true,
+      backup: true, // Alterado de BACKUP para backup
       loja: true,
       ultimoerrorelicar: true,
       ultimoerrointegracao: true,

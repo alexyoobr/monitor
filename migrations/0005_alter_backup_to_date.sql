@@ -1,17 +1,17 @@
--- Migration number: 0003 	 2025-10-19T18:35:00.000Z
--- Adicionar campo id autoincremental e alterar primary key para banco + idloja
+-- Migration number: 0005 	 2025-10-20T17:00:00.000Z
+-- Alterar campo BACKUP de TEXT para DATE e renomear para backup (minúsculo) na tabela lojas
 
 -- Criar nova tabela com a estrutura desejada
 CREATE TABLE lojas_new (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     idloja INTEGER NOT NULL,
     banco TEXT NOT NULL,
-    backup TEXT,
+    backup DATE,
     loja TEXT,
     ultimoerrorelicar TEXT,
     ultimoerrointegracao TEXT,
     qdtregistrosreplicar INTEGER,
-    replicar INTEGER,
+    replicar DATETIME,
     reglocal INTEGER,
     regservidor INTEGER,
     versaosinc TEXT,
@@ -32,12 +32,18 @@ CREATE TABLE lojas_new (
 );
 
 -- Copiar dados da tabela antiga para a nova (se houver dados)
+-- Converter o campo BACKUP para o novo nome e tipo DATE
 INSERT INTO lojas_new (idloja, banco, backup, loja, ultimoerrorelicar, ultimoerrointegracao, 
                        qdtregistrosreplicar, replicar, reglocal, regservidor, versaosinc, 
                        tempogastoreplicar, regintegracao, versaol, versaopro, versaoomnni, 
                        versaolite, versaoparelelo, versaodunamis, versaointegracao, 
                        versaoatualizador, versaotemp, ipvpn, integracao)
-SELECT idloja, banco, backup, loja, ultimoerrorelicar, ultimoerrointegracao, 
+SELECT idloja, banco, 
+       CASE 
+         WHEN BACKUP IS NOT NULL AND BACKUP != '' THEN date(BACKUP)
+         ELSE NULL
+       END as backup,
+       loja, ultimoerrorelicar, ultimoerrointegracao, 
        qdtregistrosreplicar, replicar, reglocal, regservidor, versaosinc, 
        tempogastoreplicar, regintegracao, versaol, versaopro, versaoomnni, 
        versaolite, versaoparelelo, versaodunamis, versaointegracao, 

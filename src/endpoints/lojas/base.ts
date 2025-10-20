@@ -4,12 +4,12 @@ import { z } from "zod";
 export const lojaInput = z.object({
   idloja: z.number().int(),
   banco: z.string(),
-  BACKUP: z.string().optional(),
+  backup: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), // Alterado de BACKUP para backup e de z.string().optional() para formato de data
   loja: z.string().optional(),
   ultimoerrorelicar: z.string().optional(),
   ultimoerrointegracao: z.string().optional(),
   qdtregistrosreplicar: z.number().int().optional(),
-  replicar: z.string().regex(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/).optional(), // Alterado para aceitar formato "YYYY-MM-DD HH:MM:SS"
+  replicar: z.string().regex(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/).optional(),
   reglocal: z.number().int().optional(),
   regservidor: z.number().int().optional(),
   versaosinc: z.string().optional(),

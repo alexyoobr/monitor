@@ -13,7 +13,7 @@ export class LojaCreate extends OpenAPIRoute {
         lojaInput.pick({
           banco: true,
           idloja: true,
-          BACKUP: true,
+          backup: true, // Alterado de BACKUP para backup
           loja: true,
           ultimoerrorelicar: true,
           ultimoerrointegracao: true,
