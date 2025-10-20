@@ -21,15 +21,18 @@
         }
         .filters {
             background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            margin-bottom: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         .filter-row {
             display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 0;
             align-items: center;
         }
         .filter-group {
@@ -46,6 +49,27 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             flex: 1;
+        }
+        .filter-input {
+            padding: 12px 14px;
+            height: 42px;
+            font-size: 16px;
+            line-height: 22px;
+            border: 1px solid #cfd8dc;
+            border-radius: 10px;
+            flex: 1;
+            background-color: #fff;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            overflow-y: auto;
+        }
+        .filter-input::placeholder {
+            color: #9aa0a6;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            background-color: #fff;
         }
         .filter-buttons {
             display: flex;
@@ -107,9 +131,39 @@
         }
         .table-container {
             overflow-x: auto;
-            max-height: 80vh;
             overflow-y: auto;
+            height: calc(100vh - 160px);
             -webkit-overflow-scrolling: touch;
+        }
+        /* Scrollbar (WebKit) */
+        .table-container::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #eee;
+            border-radius: 8px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #bbb;
+            border-radius: 8px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a6a6a6;
+        }
+        @media (max-width: 1024px) {
+            th, td { min-width: 120px; }
+        }
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .filters { padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; }
+            .filter-row { gap: 10px; }
+            .filter-input { font-size: 14px; height: 40px; }
+            th, td { min-width: 110px; padding: 6px; }
+        }
+        @media (max-width: 480px) {
+            .filter-input { font-size: 14px; height: 38px; }
+            th, td { min-width: 100px; }
         }
     </style>
 </head>
@@ -119,12 +173,9 @@
         <div class="filters">
             <div class="filter-row">
                 <input type="text" id="searchFilter" class="filter-input" placeholder="Filtrar por banco ou loja...">
-                <div class="filter-buttons">
-                    <button class="filter-btn" onclick="applyFilters()">Filtrar</button>
-                    <button class="filter-btn clear-btn" onclick="clearFilters()">Limpar Filtros</button>
-                </div>
             </div>
         </div>
+    </div>
         
         <div class="table-container">
             <table id="lojasTable">
@@ -254,11 +305,22 @@
             displayLojas(allLojas);
         }
         
+        // Função de debounce para filtrar em tempo real
+        function debounce(fn, delay = 300) {
+            let t;
+            return (...args) => {
+                clearTimeout(t);
+                t = setTimeout(() => fn(...args), delay);
+            };
+        }
+        
         // Carregar os dados quando a página for carregada
         document.addEventListener('DOMContentLoaded', () => {
             loadLojas();
             const input = document.getElementById('searchFilter');
             if (input) {
+                const debouncedApplyFilters = debounce(applyFilters, 300);
+                input.addEventListener('input', debouncedApplyFilters);
                 input.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') {
                         e.preventDefault();
