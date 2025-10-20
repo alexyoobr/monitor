@@ -29,6 +29,19 @@ app.onError((err, c) => {
   );
 });
 
+// Servir o dashboard
+app.get("/dashboard", async (c) => {
+  const asset = await c.env.ASSETS.get("dashboard.html");
+  if (asset) {
+    return new Response(asset, {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+      },
+    });
+  }
+  return c.html("<h1>Dashboard não encontrado</h1>");
+});
+
 // Setup OpenAPI registry
 const openapi = fromHono(app, {
   docs_url: "/",

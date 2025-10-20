@@ -12,5 +12,9 @@
       "database_name": "monitor",
       "database_id": "03ecc236-c551-4238-8e58-0a4ad0444127"
     }
-  ]
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  }
 }
