@@ -39,7 +39,7 @@ describe("Task API Integration Tests", () => {
         slug: "test-task",
         description: "A task for testing",
         completed: false,
-        due_date: "2025-01-01T00:00:00.000Z",
+        due_date: "2025-01-01 00:00:00", // Alterado para novo formato
       });
 
       const response = await SELF.fetch(`http://local.test/tasks`);
@@ -65,7 +65,7 @@ describe("Task API Integration Tests", () => {
         slug: "new-task",
         description: "A brand new task",
         completed: false,
-        due_date: "2025-12-31T23:59:59.000Z",
+        due_date: "2025-12-31 23:59:59", // Alterado para novo formato
       };
       const response = await SELF.fetch(`http://local.test/tasks`, {
         method: "POST",
@@ -111,7 +111,7 @@ describe("Task API Integration Tests", () => {
         slug: "specific-task",
         description: "A task to be fetched by ID",
         completed: false,
-        due_date: "2025-06-01T12:00:00.000Z",
+        due_date: "2025-06-01 12:00:00", // Alterado para novo formato
       };
       const taskId = await createTask(taskData);
 
@@ -149,7 +149,7 @@ describe("Task API Integration Tests", () => {
         slug: "task-to-update",
         description: "This task will be updated",
         completed: false,
-        due_date: "2025-07-01T00:00:00.000Z",
+        due_date: "2025-07-01 00:00:00", // Alterado para novo formato
       };
       const taskId = await createTask(taskData);
 
@@ -158,7 +158,7 @@ describe("Task API Integration Tests", () => {
         slug: "updated-task",
         description: "This task has been updated",
         completed: true,
-        due_date: "2025-07-15T10:00:00.000Z",
+        due_date: "2025-07-15 10:00:00", // Alterado para novo formato
       };
 
       const response = await SELF.fetch(`http://local.test/tasks/${taskId}`, {
@@ -185,7 +185,7 @@ describe("Task API Integration Tests", () => {
         slug: "updated-task",
         description: "This task has been updated",
         completed: true,
-        due_date: "2025-07-15T10:00:00.000Z",
+        due_date: "2025-07-15 10:00:00", // Alterado para novo formato
       };
       const response = await SELF.fetch(
         `http://local.test/tasks/${nonExistentId}`,
@@ -205,7 +205,7 @@ describe("Task API Integration Tests", () => {
         slug: "task",
         description: "...",
         completed: false,
-        due_date: "2025-01-01T00:00:00.000Z",
+        due_date: "2025-01-01 00:00:00", // Alterado para novo formato
       });
       const invalidUpdateData = { name: "" }; // Invalid name
       const response = await SELF.fetch(`http://local.test/tasks/${taskId}`, {
@@ -226,7 +226,7 @@ describe("Task API Integration Tests", () => {
         slug: "task-to-delete",
         description: "This task will be deleted",
         completed: false,
-        due_date: "2025-08-01T00:00:00.000Z",
+        due_date: "2025-08-01 00:00:00", // Alterado para novo formato
       };
       const taskId = await createTask(taskData);
 

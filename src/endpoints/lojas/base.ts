@@ -9,7 +9,7 @@ export const lojaInput = z.object({
   ultimoerrorelicar: z.string().optional(),
   ultimoerrointegracao: z.string().optional(),
   qdtregistrosreplicar: z.number().int().optional(),
-  replicar: z.string().datetime().optional(), // Alterado de z.number().int().optional() para z.string().datetime().optional()
+  replicar: z.string().regex(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/).optional(), // Alterado para aceitar formato "YYYY-MM-DD HH:MM:SS"
   reglocal: z.number().int().optional(),
   regservidor: z.number().int().optional(),
   versaosinc: z.string().optional(),
@@ -41,11 +41,12 @@ export const LojaModel = {
     // Handle optional fields properly
     const result: any = { ...obj };
     
+    // Não converter o campo replicar, manter o formato original
+    
     // Convert numeric fields that might come as strings
     if (obj.qdtregistrosreplicar !== undefined && obj.qdtregistrosreplicar !== null) {
       result.qdtregistrosreplicar = Number(obj.qdtregistrosreplicar);
     }
-    // Removido o tratamento especial para replicar, já que agora é datetime
     if (obj.reglocal !== undefined && obj.reglocal !== null) {
       result.reglocal = Number(obj.reglocal);
     }
