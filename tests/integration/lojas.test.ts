@@ -38,7 +38,7 @@ describe("Loja API Integration Tests", () => {
         banco: "Test Banco",
         idloja: 1,
         loja: "Test Loja",
-        replicar: 1,
+        replicar: "2025-10-20T10:00:00Z", // Alterado para formato datetime
         integracao: 1,
       });
 
@@ -62,7 +62,7 @@ describe("Loja API Integration Tests", () => {
         ultimoerrorelicar: "No errors",
         ultimoerrointegracao: "No errors",
         qdtregistrosreplicar: 100,
-        replicar: 1,
+        replicar: "2025-10-20T10:00:00Z", // Alterado para formato datetime
         reglocal: 50,
         regservidor: 50,
         versaosinc: "1.0.0",
@@ -104,7 +104,7 @@ describe("Loja API Integration Tests", () => {
         banco: "Minimal Banco",
         idloja: 1,
         loja: "Minimal Loja",
-        replicar: 1,
+        replicar: "2025-10-20T10:00:00Z", // Alterado para formato datetime
         integracao: 1,
       };
       const response = await SELF.fetch(`http://local.test/lojas`, {
@@ -135,7 +135,7 @@ describe("Loja API Integration Tests", () => {
         banco: "Specific Banco",
         idloja: 1,
         loja: "Specific Loja",
-        replicar: 1,
+        replicar: "2025-10-20T10:00:00Z", // Alterado para formato datetime
         integracao: 1,
       };
       const { banco, idloja } = await createLoja(lojaData);
@@ -173,14 +173,14 @@ describe("Loja API Integration Tests", () => {
         banco: "Loja to Update",
         idloja: 1,
         loja: "Loja to Update",
-        replicar: 1,
+        replicar: "2025-10-20T10:00:00Z", // Alterado para formato datetime
         integracao: 1,
       };
       const { banco, idloja } = await createLoja(lojaData);
 
       const updatedData = {
         loja: "Updated Loja",
-        replicar: 0,
+        replicar: "2025-10-20T11:00:00Z", // Alterado para formato datetime
         integracao: 0,
       };
 
@@ -210,7 +210,7 @@ describe("Loja API Integration Tests", () => {
         banco: "Loja to Delete",
         idloja: 1,
         loja: "Loja to Delete",
-        replicar: 1,
+        replicar: "2025-10-20T10:00:00Z", // Alterado para formato datetime
         integracao: 1,
       };
       const { banco, idloja } = await createLoja(lojaData);

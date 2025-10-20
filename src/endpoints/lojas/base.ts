@@ -9,7 +9,7 @@ export const lojaInput = z.object({
   ultimoerrorelicar: z.string().optional(),
   ultimoerrointegracao: z.string().optional(),
   qdtregistrosreplicar: z.number().int().optional(),
-  replicar: z.number().int().optional(),
+  replicar: z.string().datetime().optional(), // Alterado de z.number().int().optional() para z.string().datetime().optional()
   reglocal: z.number().int().optional(),
   regservidor: z.number().int().optional(),
   versaosinc: z.string().optional(),
@@ -45,9 +45,7 @@ export const LojaModel = {
     if (obj.qdtregistrosreplicar !== undefined && obj.qdtregistrosreplicar !== null) {
       result.qdtregistrosreplicar = Number(obj.qdtregistrosreplicar);
     }
-    if (obj.replicar !== undefined && obj.replicar !== null) {
-      result.replicar = Number(obj.replicar);
-    }
+    // Removido o tratamento especial para replicar, já que agora é datetime
     if (obj.reglocal !== undefined && obj.reglocal !== null) {
       result.reglocal = Number(obj.reglocal);
     }
