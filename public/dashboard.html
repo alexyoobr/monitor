@@ -118,6 +118,10 @@
         tr:hover {
             background-color: #f5f5f5;
         }
+        .row-alert {
+            background-color: #ffebee !important;
+            color: #b00020;
+        }
         .loading {
             text-align: center;
             padding: 20px;
@@ -222,22 +226,34 @@
         let allLojas = [];
         
         // Função para carregar os dados das lojas
-        async function loadLojas() {
+        async function loadLojas(silent = false) {
             const tableBody = document.getElementById('lojasTableBody');
-            tableBody.innerHTML = '<tr><td colspan="25" class="loading">Carregando dados...</td></tr>';
+            if (!silent) {
+                tableBody.innerHTML = '<tr><td colspan="25" class="loading">Carregando dados...</td></tr>';
+            }
             
             try {
-                const response = await fetch('/lojas');
+                const response = await fetch('/lojas?limit=100000');
                 const data = await response.json();
                 
                 if (data.success) {
                     allLojas = data.result;
-                    displayLojas(allLojas);
+                    const input = document.getElementById('searchFilter');
+                    const hasSearch = input && input.value.trim().length > 0;
+                    if (hasSearch) {
+                        applyFilters();
+                    } else {
+                        displayLojas(allLojas);
+                    }
                 } else {
-                    tableBody.innerHTML = '<tr><td colspan="25" class="error">Erro ao carregar dados: ' + (data.errors ? data.errors[0].message : 'Erro desconhecido') + '</td></tr>';
+                    if (!silent) {
+                        tableBody.innerHTML = '<tr><td colspan="25" class="error">Erro ao carregar dados: ' + (data.errors ? data.errors[0].message : 'Erro desconhecido') + '</td></tr>';
+                    }
                 }
             } catch (error) {
-                tableBody.innerHTML = '<tr><td colspan="25" class="error">Erro ao carregar dados: ' + error.message + '</td></tr>';
+                if (!silent) {
+                    tableBody.innerHTML = '<tr><td colspan="25" class="error">Erro ao carregar dados: ' + error.message + '</td></tr>';
+                }
             }
         }
         
@@ -283,6 +299,17 @@
                     <td>${loja.ipvpn || ''}</td>
                     <td>${loja.integracao !== undefined ? loja.integracao : ''}</td>
                 `;
+                // Regra: destacar em vermelho se (reglocal||regintegracao||regservidor > 0) e (ultimoerrorelicar||ultimoerrointegracao != vazio)
+                const reglocal = Number(loja.reglocal || 0);
+                const regintegracao = Number(loja.regintegracao || 0);
+                const regservidor = Number(loja.regservidor || 0);
+                const hasRegs = reglocal > 0 || regintegracao > 0 || regservidor > 0;
+                const erroReplicar = (loja.ultimoerrorelicar && String(loja.ultimoerrorelicar).trim() !== '');
+                const erroIntegracao = (loja.ultimoerrointegracao && String(loja.ultimoerrointegracao).trim() !== '');
+                const hasErrors = erroReplicar || erroIntegracao;
+                if (hasRegs && hasErrors) {
+                    row.classList.add('row-alert');
+                }
                 tableBody.appendChild(row);
             });
         }
@@ -328,6 +355,10 @@
                     }
                 });
             }
+            // Auto-atualização a cada 60 segundos, sem piscar "carregando"
+            setInterval(() => {
+                loadLojas(true);
+            }, 60000);
         });
     </script>
 </body>
