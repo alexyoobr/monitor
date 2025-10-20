@@ -6,7 +6,7 @@ CREATE TABLE lojas_new (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     idloja INTEGER NOT NULL,
     banco TEXT NOT NULL,
-    BACKUP TEXT,
+    backup TEXT,
     loja TEXT,
     ultimoerrorelicar TEXT,
     ultimoerrointegracao TEXT,

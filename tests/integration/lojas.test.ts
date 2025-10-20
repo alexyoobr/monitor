@@ -38,7 +38,7 @@ describe("Loja API Integration Tests", () => {
         banco: "Test Banco",
         idloja: 1,
         loja: "Test Loja",
-        replicar: "2025-10-20 10:00:00", // Alterado para novo formato
+        replicar: "2025-10-20 10:00:00",
         integracao: 1,
       });
 
@@ -62,7 +62,7 @@ describe("Loja API Integration Tests", () => {
         ultimoerrorelicar: "No errors",
         ultimoerrointegracao: "No errors",
         qdtregistrosreplicar: 100,
-        replicar: "2025-10-20 10:00:00", // Alterado para novo formato
+        replicar: "2025-10-20 10:00:00",
         reglocal: 50,
         regservidor: 50,
         versaosinc: "1.0.0",
@@ -104,7 +104,7 @@ describe("Loja API Integration Tests", () => {
         banco: "Minimal Banco",
         idloja: 1,
         loja: "Minimal Loja",
-        replicar: "2025-10-20 10:00:00", // Alterado para novo formato
+        replicar: "2025-10-20 10:00:00",
         integracao: 1,
       };
       const response = await SELF.fetch(`http://local.test/lojas`, {
@@ -126,6 +126,54 @@ describe("Loja API Integration Tests", () => {
         }),
       );
     });
+
+    it("should update an existing loja (upsert) when banco+idloja already exists", async () => {
+      // Criar uma loja inicialmente
+      const lojaData = {
+        banco: "Upsert Banco",
+        idloja: 1,
+        loja: "Original Loja",
+        replicar: "2025-10-20 10:00:00",
+        integracao: 1,
+      };
+      
+      // Primeira requisição - deve criar
+      const createResponse = await SELF.fetch(`http://local.test/lojas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(lojaData),
+      });
+      
+      expect(createResponse.status).toBe(201);
+      
+      // Segunda requisição com os mesmos banco+idloja - deve atualizar
+      const updateLojaData = {
+        banco: "Upsert Banco",
+        idloja: 1,
+        loja: "Updated Loja",
+        replicar: "2025-10-20 11:00:00",
+        integracao: 0,
+      };
+      
+      const updateResponse = await SELF.fetch(`http://local.test/lojas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateLojaData),
+      });
+      
+      const updateBody = await updateResponse.json<{ success: boolean; result: any }>();
+      
+      expect(updateResponse.status).toBe(200); // Status 200 indica atualização
+      expect(updateBody.success).toBe(true);
+      expect(updateBody.result).toEqual(
+        expect.objectContaining({
+          banco: "Upsert Banco",
+          idloja: 1,
+          loja: "Updated Loja",
+          integracao: 0,
+        }),
+      );
+    });
   });
 
   // Tests for GET /lojas/{banco}/{idloja}
@@ -135,7 +183,7 @@ describe("Loja API Integration Tests", () => {
         banco: "Specific Banco",
         idloja: 1,
         loja: "Specific Loja",
-        replicar: "2025-10-20 10:00:00", // Alterado para novo formato
+        replicar: "2025-10-20 10:00:00",
         integracao: 1,
       };
       const { banco, idloja } = await createLoja(lojaData);
@@ -173,14 +221,14 @@ describe("Loja API Integration Tests", () => {
         banco: "Loja to Update",
         idloja: 1,
         loja: "Loja to Update",
-        replicar: "2025-10-20 10:00:00", // Alterado para novo formato
+        replicar: "2025-10-20 10:00:00",
         integracao: 1,
       };
       const { banco, idloja } = await createLoja(lojaData);
 
       const updatedData = {
         loja: "Updated Loja",
-        replicar: "2025-10-20 11:00:00", // Alterado para novo formato
+        replicar: "2025-10-20 11:00:00",
         integracao: 0,
       };
 
@@ -210,7 +258,7 @@ describe("Loja API Integration Tests", () => {
         banco: "Loja to Delete",
         idloja: 1,
         loja: "Loja to Delete",
-        replicar: "2025-10-20 10:00:00", // Alterado para novo formato
+        replicar: "2025-10-20 10:00:00",
         integracao: 1,
       };
       const { banco, idloja } = await createLoja(lojaData);
