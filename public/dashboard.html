@@ -45,10 +45,12 @@
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            flex: 1;
         }
         .filter-buttons {
             display: flex;
             gap: 10px;
+            margin-left: auto;
         }
         .filter-btn {
             background-color: #4CAF50;
@@ -69,20 +71,19 @@
             background-color: #d32f2f;
         }
         table {
-            width: 100%;
+            width: max-content;
             border-collapse: collapse;
             margin-top: 20px;
             background-color: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            table-layout: fixed;
+            table-layout: auto;
         }
         th, td {
             padding: 8px;
             text-align: left;
             border-bottom: 1px solid #ddd;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            min-width: 140px;
         }
         th {
             background-color: #4CAF50;
@@ -108,6 +109,7 @@
             overflow-x: auto;
             max-height: 80vh;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
     </style>
 </head>
@@ -118,18 +120,11 @@
         <!-- Filtros -->
         <div class="filters">
             <div class="filter-row">
-                <div class="filter-group">
-                    <label for="bancoFilter">Banco:</label>
-                    <input type="text" id="bancoFilter" placeholder="Filtrar por banco...">
+                <input type="text" id="searchFilter" class="filter-input" placeholder="Filtrar por banco ou loja...">
+                <div class="filter-buttons">
+                    <button class="filter-btn" onclick="applyFilters()">Filtrar</button>
+                    <button class="filter-btn clear-btn" onclick="clearFilters()">Limpar Filtros</button>
                 </div>
-                <div class="filter-group">
-                    <label for="lojaFilter">Loja:</label>
-                    <input type="text" id="lojaFilter" placeholder="Filtrar por loja...">
-                </div>
-            </div>
-            <div class="filter-buttons">
-                <button class="filter-btn" onclick="applyFilters()">Filtrar</button>
-                <button class="filter-btn clear-btn" onclick="clearFilters()">Limpar Filtros</button>
             </div>
         </div>
         
@@ -245,22 +240,19 @@
         
         // Função para aplicar os filtros
         function applyFilters() {
-            const bancoFilter = document.getElementById('bancoFilter').value.toLowerCase();
-            const lojaFilter = document.getElementById('lojaFilter').value.toLowerCase();
-            
+            const search = document.getElementById('searchFilter').value.toLowerCase().trim();
             const filteredLojas = allLojas.filter(loja => {
-                const bancoMatch = !bancoFilter || (loja.banco && loja.banco.toLowerCase().includes(bancoFilter));
-                const lojaMatch = !lojaFilter || (loja.loja && loja.loja.toLowerCase().includes(lojaFilter));
-                return bancoMatch && lojaMatch;
+                if (!search) return true;
+                const bancoMatch = !!(loja.banco && loja.banco.toLowerCase().includes(search));
+                const lojaMatch = !!(loja.loja && loja.loja.toLowerCase().includes(search));
+                return bancoMatch || lojaMatch;
             });
-            
             displayLojas(filteredLojas);
         }
         
         // Função para limpar os filtros
         function clearFilters() {
-            document.getElementById('bancoFilter').value = '';
-            document.getElementById('lojaFilter').value = '';
+            document.getElementById('searchFilter').value = '';
             displayLojas(allLojas);
         }
         
