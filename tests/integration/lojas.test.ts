@@ -49,6 +49,28 @@ describe("Loja API Integration Tests", () => {
       expect(body.success).toBe(true);
       expect(body.result.length).toBeGreaterThanOrEqual(1);
     });
+
+    it("should seed multiple lojas and list them", async () => {
+      const seedResponse = await SELF.fetch(`http://local.test/lojas/seed`);
+      const seedBody = await seedResponse.json<{ success: boolean; inserted: number }>();
+
+      expect(seedResponse.status).toBe(200);
+      expect(seedBody.success).toBe(true);
+      expect(seedBody.inserted).toBeGreaterThanOrEqual(1);
+
+      const listResponse = await SELF.fetch(`http://local.test/lojas`);
+      const listBody = await listResponse.json<{ success: boolean; result: any[] }>();
+
+      expect(listResponse.status).toBe(200);
+      expect(listBody.success).toBe(true);
+      expect(listBody.result.length).toBeGreaterThanOrEqual(seedBody.inserted);
+
+      // Spot-check fields from at least one seeded loja
+      const hasSeeded = listBody.result.some((row: any) =>
+        ["BancoA","BancoB","BancoC","BancoD","BancoE","BancoF","BancoG","BancoH"].includes(row.banco)
+      );
+      expect(hasSeeded).toBe(true);
+    });
   });
 
   // Tests for POST /lojas

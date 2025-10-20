@@ -122,6 +122,10 @@
             background-color: #ffebee !important;
             color: #b00020;
         }
+        .row-replicar-old {
+            background-color: #e3f2fd !important;
+            color: #0d47a1 !important;
+        }
         .loading {
             text-align: center;
             padding: 20px;
@@ -225,6 +229,48 @@
         // Variável para armazenar todos os dados
         let allLojas = [];
         
+        // Aplicar ordenação por cor somente na primeira chamada
+        let firstSortApplied = false;
+        
+        // Funções auxiliares para classificação de cor
+        function isRowAlertRed(loja) {
+            const reglocal = Number(loja.reglocal || 0);
+            const regintegracao = Number(loja.regintegracao || 0);
+            const regservidor = Number(loja.regservidor || 0);
+            const hasRegs = reglocal > 0 || regintegracao > 0 || regservidor > 0;
+            const erroReplicar = (loja.ultimoerrorelicar && String(loja.ultimoerrorelicar).trim() !== '');
+            const erroIntegracao = (loja.ultimoerrointegracao && String(loja.ultimoerrointegracao).trim() !== '');
+            const hasErrors = erroReplicar || erroIntegracao;
+            return hasRegs && hasErrors;
+        }
+        
+        function isReplicarOld(loja) {
+            const replicarStr = (typeof loja.replicar === 'string') ? loja.replicar.trim() : '';
+            if (!replicarStr) return false;
+            const isoStr = replicarStr.replace(' ', 'T') + '-03:00';
+            const replicarDate = new Date(isoStr);
+            if (isNaN(replicarDate.getTime())) return false;
+            const diffMs = Date.now() - replicarDate.getTime();
+            const oneHourMs = 60 * 60 * 1000;
+            return diffMs > oneHourMs;
+        }
+        
+        function sortLojasByColor(lojas) {
+            const reds = [];
+            const blues = [];
+            const normals = [];
+            for (const loja of lojas) {
+                if (isRowAlertRed(loja)) {
+                    reds.push(loja);
+                } else if (isReplicarOld(loja)) {
+                    blues.push(loja);
+                } else {
+                    normals.push(loja);
+                }
+            }
+            return reds.concat(blues, normals);
+        }
+        
         // Função para carregar os dados das lojas
         async function loadLojas(silent = false) {
             const tableBody = document.getElementById('lojasTableBody');
@@ -233,11 +279,20 @@
             }
             
             try {
-                const response = await fetch('/lojas?limit=100000');
+                const response = await fetch('/lojas?limit=10000');
                 const data = await response.json();
                 
                 if (data.success) {
                     allLojas = data.result;
+                    // Ordenar por cor na primeira chamada: vermelho > azul > normal
+                    if (!silent && !firstSortApplied) {
+                        allLojas = sortLojasByColor(allLojas);
+                        firstSortApplied = true;
+                    }
+                    // Aplicar mesma ordenação também nos refreshs (silent)
+                    if (silent) {
+                        allLojas = sortLojasByColor(allLojas);
+                    }
                     const input = document.getElementById('searchFilter');
                     const hasSearch = input && input.value.trim().length > 0;
                     if (hasSearch) {
@@ -309,6 +364,19 @@
                 const hasErrors = erroReplicar || erroIntegracao;
                 if (hasRegs && hasErrors) {
                     row.classList.add('row-alert');
+                }
+                // Destacar em azul quando 'replicar' estiver mais de 1 hora atrás do agora
+                const replicarStr = (typeof loja.replicar === 'string') ? loja.replicar.trim() : '';
+                if (replicarStr) {
+                    const isoStr = replicarStr.replace(' ', 'T') + '-03:00';
+                    const replicarDate = new Date(isoStr);
+                    if (!isNaN(replicarDate.getTime())) {
+                        const diffMs = Date.now() - replicarDate.getTime();
+                        const oneHourMs = 60 * 60 * 1000;
+                        if (diffMs > oneHourMs) {
+                            row.classList.add('row-replicar-old');
+                        }
+                    }
                 }
                 tableBody.appendChild(row);
             });
