@@ -261,6 +261,31 @@
         body.dark .table-container::-webkit-scrollbar-thumb:hover {
             background: #3c4a5e;
         }
+        /* Painel de colunas */
+        .columns-panel {
+            display: none;
+            position: absolute;
+            right: 16px;
+            top: 66px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 10px;
+            width: 280px;
+            z-index: 20;
+        }
+        .columns-panel.open { display: block; }
+        .columns-panel h3 { margin: 6px 0 8px; font-size: 14px; }
+        .columns-list { max-height: 260px; overflow-y: auto; padding-right: 6px; }
+        .columns-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+        .drag-handle { cursor: grab; user-select: none; color: #666; }
+        .columns-actions { display: flex; justify-content: space-between; margin-top: 8px; }
+        .columns-actions button { padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; background: #fafafa; cursor: pointer; }
+        .columns-actions button:hover { background: #f0f0ff; border-color: #cbd0ff; }
+        body.dark .columns-panel { background: #141821; border-color: #2a3445; }
+        body.dark .columns-actions button { background: #0f1115; border-color: #2a3445; color: #e0e6f0; }
+        body.dark .columns-actions button:hover { background: #1b2130; }
     </style>
 </head>
 <body>
@@ -279,6 +304,8 @@
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                     </button>
+                    <!-- Gerenciar colunas -->
+                    <button id="manageColumns" class="filter-btn" type="button" title="Colunas">Colunas</button>
                 </div>
             </div>
         </div>
@@ -287,33 +314,7 @@
         <div class="table-container">
             <table id="lojasTable">
                 <thead>
-                    <tr>
-                        <th class="sortable" data-key="id">ID <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="idloja">ID Loja <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="banco">Banco <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="backup">Backup <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="loja">Loja <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="ultimoerrorelicar">Último Erro Replicar <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="ultimoerrointegracao">Último Erro Integração <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="qdtregistrosreplicar">Qtd Registros Replicar <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="replicar">Replicar <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="reglocal">Reg Local <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="regservidor">Reg Servidor <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaosinc">Versão Sinc <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="tempogastoreplicar">Tempo Gasto Replicar <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="regintegracao">Reg Integração <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaol">Versão L <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaopro">Versão Pro <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaoomnni">Versão Omnni <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaolite">Versão Lite <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaoparelelo">Versão Paralelo <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaodunamis">Versão Dunamis <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaointegracao">Versão Integração <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaoatualizador">Versão Atualizador <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="versaotemp">Versão Temp <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="ipvpn">IP VPN <span class="sort-indicator"></span></th>
-                        <th class="sortable" data-key="integracao">Integração <span class="sort-indicator"></span></th>
-                    </tr>
+                    <tr id="lojasHeaderRow"></tr>
                 </thead>
                 <tbody id="lojasTableBody">
                     <tr>
@@ -332,7 +333,160 @@
         let firstSortApplied = false;
         let currentSort = { key: null, direction: 'asc' };
         
-        // Funções auxiliares para classificação de cor
+        // Definição de colunas (ordem e rótulos)
+        const defaultColumns = [
+          { key: 'id', label: 'ID' },
+          { key: 'idloja', label: 'ID Loja' },
+          { key: 'banco', label: 'Banco' },
+          { key: 'backup', label: 'Backup' },
+          { key: 'loja', label: 'Loja' },
+          { key: 'ultimoerrorelicar', label: 'Último Erro Replicar' },
+          { key: 'ultimoerrointegracao', label: 'Último Erro Integração' },
+          { key: 'qdtregistrosreplicar', label: 'Qtd Registros Replicar' },
+          { key: 'replicar', label: 'Replicar' },
+          { key: 'reglocal', label: 'Reg Local' },
+          { key: 'regservidor', label: 'Reg Servidor' },
+          { key: 'versaosinc', label: 'Versão Sinc' },
+          { key: 'tempogastoreplicar', label: 'Tempo Gasto Replicar' },
+          { key: 'regintegracao', label: 'Reg Integração' },
+          { key: 'versaol', label: 'Versão L' },
+          { key: 'versaopro', label: 'Versão Pro' },
+          { key: 'versaoomnni', label: 'Versão Omnni' },
+          { key: 'versaolite', label: 'Versão Lite' },
+          { key: 'versaoparelelo', label: 'Versão Paralelo' },
+          { key: 'versaodunamis', label: 'Versão Dunamis' },
+          { key: 'versaointegracao', label: 'Versão Integração' },
+          { key: 'versaoatualizador', label: 'Versão Atualizador' },
+          { key: 'versaotemp', label: 'Versão Temp' },
+          { key: 'ipvpn', label: 'IP VPN' },
+          { key: 'integracao', label: 'Integração' },
+        ];
+        const STORAGE_ORDER = 'dashboard.columnsOrder';
+        const STORAGE_VISIBLE = 'dashboard.visibleColumns';
+        let columnsOrder = [];
+        let visibleColumns = new Set();
+        
+        function loadColumnPrefs() {
+          try {
+            const savedOrder = JSON.parse(localStorage.getItem(STORAGE_ORDER) || 'null');
+            const savedVisible = JSON.parse(localStorage.getItem(STORAGE_VISIBLE) || 'null');
+            const defaultOrder = defaultColumns.map(c => c.key);
+            columnsOrder = Array.isArray(savedOrder) ? savedOrder.filter(k => defaultOrder.includes(k)) : defaultOrder;
+            visibleColumns = new Set(Array.isArray(savedVisible) ? savedVisible.filter(k => defaultOrder.includes(k)) : defaultOrder);
+            // Salvaguarda: evitar estado sem colunas visíveis ou sem ordem
+            if (!columnsOrder.length) columnsOrder = defaultOrder;
+            if (visibleColumns.size === 0) visibleColumns = new Set(defaultOrder);
+          } catch (_) {
+            columnsOrder = defaultColumns.map(c => c.key);
+            visibleColumns = new Set(columnsOrder);
+          }
+        }
+        function saveColumnPrefs() {
+          localStorage.setItem(STORAGE_ORDER, JSON.stringify(columnsOrder));
+          localStorage.setItem(STORAGE_VISIBLE, JSON.stringify(Array.from(visibleColumns)));
+        }
+        function buildHeader() {
+          const theadRow = document.getElementById('lojasHeaderRow');
+          if (!theadRow) return;
+          theadRow.innerHTML = '';
+          const frag = document.createDocumentFragment();
+          columnsOrder.forEach(key => {
+            if (!visibleColumns.has(key)) return;
+            const col = defaultColumns.find(c => c.key === key);
+            const th = document.createElement('th');
+            th.className = 'sortable';
+            th.dataset.key = key;
+            th.draggable = true;
+            th.textContent = col ? col.label : key;
+            const span = document.createElement('span');
+            span.className = 'sort-indicator';
+            th.appendChild(document.createTextNode(' '));
+            th.appendChild(span);
+            frag.appendChild(th);
+          });
+          theadRow.appendChild(frag);
+          setupSorting();
+          enableHeaderDrag();
+          updateSortIndicators();
+        }
+        function enableHeaderDrag() {
+          const headers = document.querySelectorAll('#lojasTable thead th.sortable');
+          let draggedKey = null;
+          headers.forEach(th => {
+            th.addEventListener('dragstart', (e) => {
+              draggedKey = th.dataset.key;
+              e.dataTransfer.effectAllowed = 'move';
+            });
+            th.addEventListener('dragover', (e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+            });
+            th.addEventListener('drop', (e) => {
+              e.preventDefault();
+              const targetKey = th.dataset.key;
+              if (!draggedKey || !targetKey || draggedKey === targetKey) return;
+              const from = columnsOrder.indexOf(draggedKey);
+              const to = columnsOrder.indexOf(targetKey);
+              if (from < 0 || to < 0) return;
+              columnsOrder.splice(from, 1);
+              columnsOrder.splice(to, 0, draggedKey);
+              saveColumnPrefs();
+              buildHeader();
+              const input = document.getElementById('searchFilter');
+              const hasSearch = input && input.value.trim().length > 0;
+              if (hasSearch) {
+                applyFilters();
+              } else {
+                displayLojas(sortActiveOrColor(allLojas));
+              }
+            });
+          });
+        }
+        function buildColumnsPanel() {
+          const panelId = 'columnsPanel';
+          let panel = document.getElementById(panelId);
+          if (!panel) {
+            panel = document.createElement('div');
+            panel.id = panelId;
+            panel.className = 'columns-panel';
+            panel.innerHTML = `<h3>Colunas</h3><div class="columns-list" id="columnsList"></div><div class="columns-actions"><button id="resetCols">Resetar</button><button id="closeCols">Fechar</button></div>`;
+            document.body.appendChild(panel);
+          }
+          const list = document.getElementById('columnsList');
+          list.innerHTML = '';
+          columnsOrder.forEach(key => {
+            const col = defaultColumns.find(c => c.key === key);
+            const item = document.createElement('div');
+            item.className = 'columns-item';
+            item.innerHTML = `<span class="drag-handle">☰</span><label style="flex:1"><input type="checkbox" ${visibleColumns.has(key) ? 'checked' : ''} data-key="${key}"> ${col ? col.label : key}</label>`;
+            list.appendChild(item);
+          });
+          list.querySelectorAll('input[type="checkbox"]').forEach(inp => {
+            inp.addEventListener('change', (e) => {
+              const k = inp.getAttribute('data-key');
+              if (!k) return;
+              if (inp.checked) visibleColumns.add(k); else visibleColumns.delete(k);
+              saveColumnPrefs();
+              buildHeader();
+              const input = document.getElementById('searchFilter');
+              const hasSearch = input && input.value.trim().length > 0;
+              if (hasSearch) { applyFilters(); } else { displayLojas(sortActiveOrColor(allLojas)); }
+            });
+          });
+          document.getElementById('resetCols').onclick = () => {
+            columnsOrder = defaultColumns.map(c => c.key);
+            visibleColumns = new Set(columnsOrder);
+            saveColumnPrefs();
+            buildColumnsPanel();
+            buildHeader();
+            displayLojas(sortActiveOrColor(allLojas));
+          };
+          document.getElementById('closeCols').onclick = () => {
+            panel.classList.remove('open');
+          };
+          return panel;
+        }
+        
         function isRowAlertRed(loja) {
             const reglocal = Number(loja.reglocal || 0);
             const regintegracao = Number(loja.regintegracao || 0);
@@ -417,55 +571,32 @@
             const tableBody = document.getElementById('lojasTableBody');
             
             if (lojas.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="25" class="loading">Nenhuma loja encontrada.</td></tr>';
+                const visibleCount = columnsOrder.filter(k => visibleColumns.has(k)).length || 1;
+                tableBody.innerHTML = `<tr><td colspan="${visibleCount}" class="loading">Nenhuma loja encontrada.</td></tr>`;
                 return;
             }
             
             // Limpar a tabela
             tableBody.innerHTML = '';
             
-            // Preencher a tabela com os dados
+            const numericKeys = new Set(['id','idloja','qdtregistrosreplicar','reglocal','regservidor','tempogastoreplicar','regintegracao','integracao']);
             lojas.forEach(loja => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${loja.id || ''}</td>
-                    <td>${loja.idloja || ''}</td>
-                    <td>${loja.banco || ''}</td>
-                    <td>${loja.backup || ''}</td>
-                    <td>${loja.loja || ''}</td>
-                    <td>${loja.ultimoerrorelicar || ''}</td>
-                    <td>${loja.ultimoerrointegracao || ''}</td>
-                    <td>${loja.qdtregistrosreplicar !== undefined ? loja.qdtregistrosreplicar : ''}</td>
-                    <td>${loja.replicar || ''}</td>
-                    <td>${loja.reglocal !== undefined ? loja.reglocal : ''}</td>
-                    <td>${loja.regservidor !== undefined ? loja.regservidor : ''}</td>
-                    <td>${loja.versaosinc || ''}</td>
-                    <td>${loja.tempogastoreplicar !== undefined ? loja.tempogastoreplicar : ''}</td>
-                    <td>${loja.regintegracao !== undefined ? loja.regintegracao : ''}</td>
-                    <td>${loja.versaol || ''}</td>
-                    <td>${loja.versaopro || ''}</td>
-                    <td>${loja.versaoomnni || ''}</td>
-                    <td>${loja.versaolite || ''}</td>
-                    <td>${loja.versaoparelelo || ''}</td>
-                    <td>${loja.versaodunamis || ''}</td>
-                    <td>${loja.versaointegracao || ''}</td>
-                    <td>${loja.versaoatualizador || ''}</td>
-                    <td>${loja.versaotemp || ''}</td>
-                    <td>${loja.ipvpn || ''}</td>
-                    <td>${loja.integracao !== undefined ? loja.integracao : ''}</td>
-                `;
-                // Regra: destacar em vermelho se (reglocal||regintegracao||regservidor > 0) e (ultimoerrorelicar||ultimoerrointegracao != vazio)
-                const reglocal = Number(loja.reglocal || 0);
-                const regintegracao = Number(loja.regintegracao || 0);
-                const regservidor = Number(loja.regservidor || 0);
-                const hasRegs = reglocal > 0 || regintegracao > 0 || regservidor > 0;
-                const erroReplicar = (loja.ultimoerrorelicar && String(loja.ultimoerrorelicar).trim() !== '');
-                const erroIntegracao = (loja.ultimoerrointegracao && String(loja.ultimoerrointegracao).trim() !== '');
-                const hasErrors = erroReplicar || erroIntegracao;
-                if (hasRegs && hasErrors) {
+                const cells = [];
+                columnsOrder.forEach(key => {
+                  if (!visibleColumns.has(key)) return;
+                  if (numericKeys.has(key)) {
+                    const v = loja[key];
+                    cells.push(`<td>${v !== undefined && v !== null ? v : ''}</td>`);
+                  } else {
+                    cells.push(`<td>${loja[key] || ''}</td>`);
+                  }
+                });
+                row.innerHTML = cells.join('');
+                // Destacar por alertas
+                if (isRowAlertRed(loja)) {
                     row.classList.add('row-alert');
                 } else {
-                    // Destacar em azul quando 'replicar' estiver mais de 1 hora atrás do agora
                     const replicarStr = (typeof loja.replicar === 'string') ? loja.replicar.trim() : '';
                     if (replicarStr) {
                         const isoStr = replicarStr.replace(' ', 'T') + '-03:00';
@@ -604,6 +735,15 @@
         
         // Carregar os dados quando a página for carregada
         document.addEventListener('DOMContentLoaded', () => {
+            loadColumnPrefs();
+            buildHeader();
+            const panel = buildColumnsPanel();
+            const manageBtn = document.getElementById('manageColumns');
+            if (manageBtn) {
+              manageBtn.addEventListener('click', () => {
+                panel.classList.toggle('open');
+              });
+            }
             loadLojas();
             const input = document.getElementById('searchFilter');
             if (input) {
@@ -630,7 +770,7 @@
                     applyTheme(isDark ? 'light' : 'dark');
                 });
             }
-            setupSorting();
+            // setupSorting já é chamado em buildHeader()
         });
     </script>
 </body>
