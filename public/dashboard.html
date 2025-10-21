@@ -76,17 +76,35 @@
             gap: 10px;
             margin-left: auto;
         }
+        .theme-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 10px;
+            min-width: 40px;
+            height: 40px;
+            border-radius: 10px;
+        }
+        .theme-icon-btn .icon {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.8;
+        }
+        .theme-icon-btn .icon-sun { display: none; }
+        .theme-icon-btn .icon-moon { display: inline; }
+        body.dark .theme-icon-btn .icon-sun { display: inline; }
+        body.dark .theme-icon-btn .icon-moon { display: none; }
         .filter-btn {
-            background-color: #4CAF50;
+            background-color: #7a82ff;
             color: white;
             padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
         }
         .filter-btn:hover {
-            background-color: #45a049;
+            background-color: #6b73f0;
         }
         .clear-btn {
             background-color: #f44336;
@@ -110,11 +128,14 @@
             min-width: 140px;
         }
         th {
-            background-color: #4CAF50;
+            background-color: #7a82ff;
             color: white;
             position: sticky;
             top: 0;
         }
+        th.sortable { cursor: pointer; user-select: none; }
+        th.sortable:hover { background-color: #6b73f0; }
+        th .sort-indicator { margin-left: 6px; font-size: 12px; opacity: 0.75; }
         tr:hover {
             background-color: #f5f5f5;
         }
@@ -173,6 +194,73 @@
             .filter-input { font-size: 14px; height: 38px; }
             th, td { min-width: 100px; }
         }
+        /* Tema escuro overrides */
+        body.dark {
+            background-color: #0f1115;
+            color: #e0e6f0;
+        }
+        body.dark .filters {
+            background-color: #141821;
+            box-shadow: none;
+            border: 1px solid #2a3445;
+        }
+        body.dark .filter-input {
+            background-color: #0f1115;
+            border-color: #2a3445;
+            color: #e0e6f0;
+        }
+        body.dark .filter-input::placeholder {
+            color: #8aa1b7;
+        }
+        body.dark .filter-input:focus {
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+            background-color: #0f1115;
+        }
+        body.dark .filter-btn {
+            background-color: #8b7afc;
+        }
+        body.dark .filter-btn:hover {
+            background-color: #7a69f2;
+        }
+        body.dark .clear-btn {
+            background-color: #c62828;
+        }
+        body.dark .clear-btn:hover {
+            background-color: #8e0000;
+        }
+        body.dark table {
+            background-color: #141821;
+            box-shadow: none;
+        }
+        body.dark th {
+            background-color: #8b7afc;
+            color: #e0e6f0;
+        }
+        body.dark th.sortable:hover { background-color: #7a69f2; }
+        body.dark td, body.dark th {
+            border-bottom: 1px solid #2a3445;
+        }
+        body.dark tr:hover {
+            background-color: #1b2130;
+        }
+        body.dark .row-alert {
+            background-color: #3b0d0d !important;
+            color: #ff6b6b !important;
+        }
+        body.dark .row-replicar-old {
+            background-color: #0d2538 !important;
+            color: #90caf9 !important;
+        }
+        body.dark .table-container::-webkit-scrollbar-track {
+            background: #1e2633;
+        }
+        body.dark .table-container::-webkit-scrollbar-thumb {
+            background: #2a3445;
+        }
+        body.dark .table-container::-webkit-scrollbar-thumb:hover {
+            background: #3c4a5e;
+        }
     </style>
 </head>
 <body>
@@ -181,6 +269,17 @@
         <div class="filters">
             <div class="filter-row">
                 <input type="text" id="searchFilter" class="filter-input" placeholder="Filtrar por banco ou loja...">
+                <div class="filter-buttons">
+                    <button id="toggleTheme" class="filter-btn theme-icon-btn" type="button" aria-label="Alternar tema" title="Alternar tema">
+                        <svg class="icon icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+                        </svg>
+                        <svg class="icon icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -189,31 +288,31 @@
             <table id="lojasTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>ID Loja</th>
-                        <th>Banco</th>
-                        <th>Backup</th>
-                        <th>Loja</th>
-                        <th>Último Erro Replicar</th>
-                        <th>Último Erro Integração</th>
-                        <th>Qtd Registros Replicar</th>
-                        <th>Replicar</th>
-                        <th>Reg Local</th>
-                        <th>Reg Servidor</th>
-                        <th>Versão Sinc</th>
-                        <th>Tempo Gasto Replicar</th>
-                        <th>Reg Integração</th>
-                        <th>Versão L</th>
-                        <th>Versão Pro</th>
-                        <th>Versão Omnni</th>
-                        <th>Versão Lite</th>
-                        <th>Versão Paralelo</th>
-                        <th>Versão Dunamis</th>
-                        <th>Versão Integração</th>
-                        <th>Versão Atualizador</th>
-                        <th>Versão Temp</th>
-                        <th>IP VPN</th>
-                        <th>Integração</th>
+                        <th class="sortable" data-key="id">ID <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="idloja">ID Loja <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="banco">Banco <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="backup">Backup <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="loja">Loja <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="ultimoerrorelicar">Último Erro Replicar <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="ultimoerrointegracao">Último Erro Integração <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="qdtregistrosreplicar">Qtd Registros Replicar <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="replicar">Replicar <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="reglocal">Reg Local <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="regservidor">Reg Servidor <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaosinc">Versão Sinc <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="tempogastoreplicar">Tempo Gasto Replicar <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="regintegracao">Reg Integração <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaol">Versão L <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaopro">Versão Pro <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaoomnni">Versão Omnni <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaolite">Versão Lite <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaoparelelo">Versão Paralelo <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaodunamis">Versão Dunamis <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaointegracao">Versão Integração <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaoatualizador">Versão Atualizador <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="versaotemp">Versão Temp <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="ipvpn">IP VPN <span class="sort-indicator"></span></th>
+                        <th class="sortable" data-key="integracao">Integração <span class="sort-indicator"></span></th>
                     </tr>
                 </thead>
                 <tbody id="lojasTableBody">
@@ -231,6 +330,7 @@
         
         // Aplicar ordenação por cor somente na primeira chamada
         let firstSortApplied = false;
+        let currentSort = { key: null, direction: 'asc' };
         
         // Funções auxiliares para classificação de cor
         function isRowAlertRed(loja) {
@@ -291,14 +391,14 @@
                     }
                     // Aplicar mesma ordenação também nos refreshs (silent)
                     if (silent) {
-                        allLojas = sortLojasByColor(allLojas);
+                        allLojas = sortActiveOrColor(allLojas);
                     }
                     const input = document.getElementById('searchFilter');
                     const hasSearch = input && input.value.trim().length > 0;
                     if (hasSearch) {
                         applyFilters();
                     } else {
-                        displayLojas(allLojas);
+                        displayLojas(sortActiveOrColor(allLojas));
                     }
                 } else {
                     if (!silent) {
@@ -392,13 +492,105 @@
                 const lojaMatch = !!(loja.loja && loja.loja.toLowerCase().includes(search));
                 return bancoMatch || lojaMatch;
             });
-            displayLojas(filteredLojas);
+            displayLojas(sortActiveOrColor(filteredLojas));
         }
         
         // Função para limpar os filtros
         function clearFilters() {
             document.getElementById('searchFilter').value = '';
-            displayLojas(allLojas);
+            displayLojas(sortActiveOrColor(allLojas));
+        }
+        
+        // Função de debounce para filtrar em tempo real
+        function debounce(fn, delay = 300) {
+            let t;
+            return (...args) => {
+                clearTimeout(t);
+                t = setTimeout(() => fn(...args), delay);
+            };
+        }
+        
+        // Helpers de ordenação por clique no cabeçalho
+        function parseDateBR(str, hasTime = false) {
+            const s = String(str || '').trim();
+            if (!s) return NaN;
+            const iso = hasTime ? s.replace(' ', 'T') + '-03:00' : s + 'T00:00:00-03:00';
+            const d = new Date(iso);
+            return d.getTime();
+        }
+        const numericKeys = new Set(['id','idloja','qdtregistrosreplicar','reglocal','regservidor','tempogastoreplicar','regintegracao','integracao']);
+        const timeKeys = new Set(['replicar']);
+        const dateKeys = new Set(['backup']);
+        function getComparable(loja, key) {
+            if (numericKeys.has(key)) {
+                const n = Number(loja[key]);
+                return Number.isFinite(n) ? n : null;
+            }
+            if (timeKeys.has(key)) {
+                const t = parseDateBR(loja[key], true);
+                return Number.isFinite(t) ? t : null;
+            }
+            if (dateKeys.has(key)) {
+                const t = parseDateBR(loja[key], false);
+                return Number.isFinite(t) ? t : null;
+            }
+            const s = (loja[key] ?? '').toString().toLowerCase();
+            return s || null;
+        }
+        function compareValues(va, vb, direction) {
+            const isNullA = va === null || va === undefined || (typeof va === 'number' && !Number.isFinite(va)) || (typeof va === 'string' && va === '');
+            const isNullB = vb === null || vb === undefined || (typeof vb === 'number' && !Number.isFinite(vb)) || (typeof vb === 'string' && vb === '');
+            if (isNullA && isNullB) return 0;
+            if (isNullA) return 1; // nulos sempre no fim
+            if (isNullB) return -1;
+            const mult = direction === 'asc' ? 1 : -1;
+            if (typeof va === 'number' && typeof vb === 'number') {
+                if (va === vb) return 0;
+                return mult * (va > vb ? 1 : -1);
+            }
+            return mult * String(va).localeCompare(String(vb), 'pt-BR', { numeric: true, sensitivity: 'base' });
+        }
+        function sortByKey(lojas, key, direction) {
+            return [...lojas].sort((a, b) => compareValues(getComparable(a, key), getComparable(b, key), direction));
+        }
+        function sortActiveOrColor(lojas) {
+            if (currentSort.key) return sortByKey(lojas, currentSort.key, currentSort.direction);
+            return sortLojasByColor(lojas);
+        }
+        function updateSortIndicators() {
+            const headers = document.querySelectorAll('#lojasTable thead th.sortable');
+            headers.forEach(th => {
+                const span = th.querySelector('.sort-indicator');
+                if (!span) return;
+                if (th.dataset.key === currentSort.key) {
+                    span.textContent = currentSort.direction === 'asc' ? '▲' : '▼';
+                    span.style.opacity = '1';
+                } else {
+                    span.textContent = '';
+                    span.style.opacity = '0.75';
+                }
+            });
+        }
+        function setupSorting() {
+            const headers = document.querySelectorAll('#lojasTable thead th.sortable');
+            headers.forEach(th => th.addEventListener('click', () => {
+                const key = th.dataset.key;
+                if (!key) return;
+                if (currentSort.key === key) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort = { key, direction: 'asc' };
+                }
+                updateSortIndicators();
+                const input = document.getElementById('searchFilter');
+                const hasSearch = input && input.value.trim().length > 0;
+                if (hasSearch) {
+                    applyFilters();
+                } else {
+                    displayLojas(sortActiveOrColor(allLojas));
+                }
+            }));
+            updateSortIndicators();
         }
         
         // Função de debounce para filtrar em tempo real
@@ -424,11 +616,90 @@
                     }
                 });
             }
-            // Auto-atualização a cada 60 segundos, sem piscar "carregando"
-            setInterval(() => {
-                loadLojas(true);
-            }, 60000);
+            setInterval(() => { loadLojas(true); }, 60000);
+            const themeBtn = document.getElementById('toggleTheme');
+            function applyTheme(theme) {
+                document.body.classList.toggle('dark', theme === 'dark');
+                try { localStorage.setItem('theme', theme); } catch (e) {}
+            }
+            const savedTheme = (function(){ try { return localStorage.getItem('theme') || 'light'; } catch(e) { return 'light'; } })();
+            applyTheme(savedTheme);
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    const isDark = document.body.classList.contains('dark');
+                    applyTheme(isDark ? 'light' : 'dark');
+                });
+            }
+            setupSorting();
         });
     </script>
 </body>
 </html>
+
+/* Tema escuro overrides */
+body.dark {
+    background-color: #0f1115;
+    color: #e0e6f0;
+}
+body.dark .filters {
+    background-color: #141821;
+    box-shadow: none;
+    border: 1px solid #2a3445;
+}
+body.dark .filter-input {
+    background-color: #0f1115;
+    border-color: #2a3445;
+    color: #e0e6f0;
+}
+body.dark .filter-input::placeholder {
+    color: #8aa1b7;
+}
+body.dark .filter-input:focus {
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+    background-color: #0f1115;
+}
+body.dark .filter-btn {
+    background-color: #2e7d32;
+}
+body.dark .filter-btn:hover {
+    background-color: #256628;
+}
+body.dark .clear-btn {
+    background-color: #c62828;
+}
+body.dark .clear-btn:hover {
+    background-color: #8e0000;
+}
+body.dark table {
+    background-color: #141821;
+    box-shadow: none;
+}
+body.dark th {
+    background-color: #2e7d32;
+    color: #e0e6f0;
+}
+body.dark th.sortable:hover { background-color: #7a69f2; }
+body.dark td, body.dark th {
+    border-bottom: 1px solid #2a3445;
+}
+body.dark tr:hover {
+    background-color: #1b2130;
+}
+body.dark .row-alert {
+    background-color: #3b0d0d !important;
+    color: #ff6b6b !important;
+}
+body.dark .row-replicar-old {
+    background-color: #0d2538 !important;
+    color: #90caf9 !important;
+}
+body.dark .table-container::-webkit-scrollbar-track {
+    background: #1e2633;
+}
+body.dark .table-container::-webkit-scrollbar-thumb {
+    background: #2a3445;
+}
+body.dark .table-container::-webkit-scrollbar-thumb:hover {
+    background: #3c4a5e;
+}
