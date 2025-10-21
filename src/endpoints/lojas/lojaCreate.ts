@@ -10,31 +10,10 @@ export class LojaCreate extends OpenAPIRoute {
     operationId: "loja-upsert",
     request: {
       body: contentJson(
-        lojaInput.pick({
-          banco: true,
-          idloja: true,
-          backup: true, // Alterado de BACKUP para backup
-          loja: true,
-          ultimoerrorelicar: true,
-          ultimoerrointegracao: true,
-          qdtregistrosreplicar: true,
-          replicar: true,
-          reglocal: true,
-          regservidor: true,
-          versaosinc: true,
-          tempogastoreplicar: true,
-          regintegracao: true,
-          versaol: true,
-          versaopro: true,
-          versaoomnni: true,
-          versaolite: true,
-          versaoparelelo: true,
-          versaodunamis: true,
-          versaointegracao: true,
-          versaoatualizador: true,
-          versaotemp: true,
-          ipvpn: true,
-          integracao: true,
+        // Apenas banco e idloja obrigatórios; demais campos todos opcionais
+        lojaInput.partial().extend({
+          banco: z.string(),
+          idloja: z.number().int(),
         }),
       ),
     },
@@ -71,18 +50,18 @@ export class LojaCreate extends OpenAPIRoute {
     .first();
     
     if (existingLoja) {
-      // Atualizar loja existente (upsert)
+      // Atualizar loja existente (upsert parcial: apenas campos presentes no body)
       const fields = Object.keys(serializedData).filter(key => key !== 'banco' && key !== 'idloja');
-      const setClause = fields.map(field => `${field} = ?`).join(', ');
-      const values = fields.map(field => serializedData[field]);
-      
-      await db.prepare(
-        `UPDATE ${LojaModel.tableName} SET ${setClause} WHERE banco = ? AND idloja = ?`
-      )
-      .bind(...values, serializedData.banco, serializedData.idloja)
-      .run();
-      
-      // Obter os dados atualizados
+      if (fields.length > 0) {
+        const setClause = fields.map(field => `${field} = ?`).join(', ');
+        const values = fields.map(field => serializedData[field]);
+        await db.prepare(
+          `UPDATE ${LojaModel.tableName} SET ${setClause} WHERE banco = ? AND idloja = ?`
+        )
+        .bind(...values, serializedData.banco, serializedData.idloja)
+        .run();
+      }
+      // Obter os dados (atualizado ou original, se não havia campos para atualizar)
       const updatedLoja = await db.prepare(
         `SELECT * FROM ${LojaModel.tableName} WHERE banco = ? AND idloja = ?`
       )
