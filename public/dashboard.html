@@ -139,6 +139,16 @@
         tr:hover {
             background-color: #f5f5f5;
         }
+        tr.selected {
+            background-color: #e8f5e8 !important;
+            border-left: 4px solid #4CAF50;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+        body.dark tr.selected {
+            background-color: #2d4a2d !important;
+            border-left: 4px solid #66bb6a;
+            box-shadow: 0 2px 8px rgba(102, 187, 106, 0.3);
+        }
         .row-alert {
             background-color: #ffebee !important;
             color: #b00020;
@@ -593,6 +603,17 @@
                   }
                 });
                 row.innerHTML = cells.join('');
+                
+                // Adicionar event listener para seleção de linha
+                row.addEventListener('click', function(e) {
+                    // Remover seleção de todas as outras linhas
+                    document.querySelectorAll('#lojasTableBody tr.selected').forEach(r => {
+                        r.classList.remove('selected');
+                    });
+                    // Adicionar seleção à linha clicada
+                    this.classList.add('selected');
+                });
+                
                 // Destacar por alertas
                 if (isRowAlertRed(loja)) {
                     row.classList.add('row-alert');
@@ -744,6 +765,23 @@
                 panel.classList.toggle('open');
               });
             }
+            
+            // Event listener para desselecionar linha ao clicar fora da tabela
+            document.addEventListener('click', (e) => {
+                const table = document.getElementById('lojasTable');
+                const columnsPanel = document.getElementById('columnsPanel');
+                
+                // Se o clique não foi na tabela nem no painel de colunas
+                if (table && !table.contains(e.target) && 
+                    columnsPanel && !columnsPanel.contains(e.target) &&
+                    !e.target.closest('#manageColumns')) {
+                    // Remover seleção de todas as linhas
+                    document.querySelectorAll('#lojasTableBody tr.selected').forEach(r => {
+                        r.classList.remove('selected');
+                    });
+                }
+            });
+            
             loadLojas();
             const input = document.getElementById('searchFilter');
             if (input) {
