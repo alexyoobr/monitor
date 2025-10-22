@@ -132,171 +132,198 @@
             color: white;
             position: sticky;
             top: 0;
+            padding-right: 20px;
+            overflow: visible;
         }
-        th.sortable { cursor: pointer; user-select: none; }
-        th.sortable:hover { background-color: #6b73f0; }
-        th .sort-indicator { margin-left: 6px; font-size: 12px; opacity: 0.75; }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        tr.selected {
-            background-color: #e8f5e8 !important;
-            border-left: 4px solid #4CAF50;
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-        }
-        body.dark tr.selected {
-            background-color: #2d4a2d !important;
-            border-left: 4px solid #66bb6a;
-            box-shadow: 0 2px 8px rgba(102, 187, 106, 0.3);
-        }
-        .row-alert {
-            background-color: #ffebee !important;
-            color: #b00020;
-        }
-        .row-replicar-old {
-            background-color: #e3f2fd !important;
-            color: #0d47a1 !important;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            font-style: italic;
-            color: #666;
-        }
-        .error {
-            color: red;
-            text-align: center;
-            padding: 20px;
-        }
-        .table-container {
-            overflow-x: auto;
-            overflow-y: auto;
-            height: calc(100vh - 160px);
-            -webkit-overflow-scrolling: touch;
-        }
-        /* Scrollbar (WebKit) */
-        .table-container::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        .table-container::-webkit-scrollbar-track {
-            background: #eee;
-            border-radius: 8px;
-        }
-        .table-container::-webkit-scrollbar-thumb {
-            background: #bbb;
-            border-radius: 8px;
-        }
-        .table-container::-webkit-scrollbar-thumb:hover {
-            background: #a6a6a6;
-        }
-        @media (max-width: 1024px) {
-            th, td { min-width: 120px; }
-        }
-        @media (max-width: 768px) {
-            body { padding: 12px; }
-            .filters { padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; }
-            .filter-row { gap: 10px; }
-            .filter-input { font-size: 14px; height: 40px; }
-            th, td { min-width: 110px; padding: 6px; }
-        }
-        @media (max-width: 480px) {
-            .filter-input { font-size: 14px; height: 38px; }
-            th, td { min-width: 100px; }
-        }
-        /* Tema escuro overrides */
-        body.dark {
-            background-color: #0f1115;
-            color: #e0e6f0;
-        }
-        body.dark .filters {
-            background-color: #141821;
-            box-shadow: none;
-            border: 1px solid #2a3445;
-        }
-        body.dark .filter-input {
-            background-color: #0f1115;
-            border-color: #2a3445;
-            color: #e0e6f0;
-        }
-        body.dark .filter-input::placeholder {
-            color: #8aa1b7;
-        }
-        body.dark .filter-input:focus {
-            border-color: #2e7d32;
-            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
-            background-color: #0f1115;
-        }
-        body.dark .filter-btn {
-            background-color: #8b7afc;
-        }
-        body.dark .filter-btn:hover {
-            background-color: #7a69f2;
-        }
-        body.dark .clear-btn {
-            background-color: #c62828;
-        }
-        body.dark .clear-btn:hover {
-            background-color: #8e0000;
-        }
-        body.dark table {
-            background-color: #141821;
-            box-shadow: none;
-        }
-        body.dark th {
-            background-color: #8b7afc;
-            color: #e0e6f0;
-        }
-        body.dark th.sortable:hover { background-color: #7a69f2; }
-        body.dark td, body.dark th {
-            border-bottom: 1px solid #2a3445;
-        }
-        body.dark tr:hover {
-            background-color: #1b2130;
-        }
-        body.dark .row-alert {
-            background-color: #3b0d0d !important;
-            color: #ff6b6b !important;
-        }
-        body.dark .row-replicar-old {
-            background-color: #0d2538 !important;
-            color: #90caf9 !important;
-        }
-        body.dark .table-container::-webkit-scrollbar-track {
-            background: #1e2633;
-        }
-        body.dark .table-container::-webkit-scrollbar-thumb {
-            background: #2a3445;
-        }
-        body.dark .table-container::-webkit-scrollbar-thumb:hover {
-            background: #3c4a5e;
-        }
-        /* Painel de colunas */
-        .columns-panel {
-            display: none;
+        /* handle de resize da coluna */
+        .col-resizer {
             position: absolute;
-            right: 16px;
-            top: 66px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            padding: 10px;
-            width: 280px;
-            z-index: 20;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 12px;
+            cursor: col-resize;
+            background: transparent;
+            z-index: 5;
+            border-left: 1px solid rgba(0,0,0,0.2);
         }
-        .columns-panel.open { display: block; }
-        .columns-panel h3 { margin: 6px 0 8px; font-size: 14px; }
-        .columns-list { max-height: 260px; overflow-y: auto; padding-right: 6px; }
-        .columns-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
-        .drag-handle { cursor: grab; user-select: none; color: #666; }
-        .columns-actions { display: flex; justify-content: space-between; margin-top: 8px; }
-        .columns-actions button { padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; background: #fafafa; cursor: pointer; }
-        .columns-actions button:hover { background: #f0f0ff; border-color: #cbd0ff; }
-        body.dark .columns-panel { background: #141821; border-color: #2a3445; }
-        body.dark .columns-actions button { background: #0f1115; border-color: #2a3445; color: #e0e6f0; }
-        body.dark .columns-actions button:hover { background: #1b2130; }
-    </style>
+        .col-resizer:hover {
+            background: rgba(0,0,0,0.08);
+        }
+        body.dark .col-resizer {
+            border-left-color: rgba(255,255,255,0.25);
+        }
+        body.dark .col-resizer:hover {
+            background: rgba(255,255,255,0.12);
+        }
+        /* evitar seleção de texto durante o resize */
+        .no-select {
+            user-select: none;
+        }
+            th.sortable { cursor: pointer; user-select: none; }
+            th.sortable:hover { background-color: #6b73f0; }
+            th .sort-indicator { margin-left: 6px; font-size: 12px; opacity: 0.75; }
+            tr:hover {
+                background-color: #f5f5f5;
+            }
+            tr.selected {
+                background-color: #e8f5e8 !important;
+                border-left: 4px solid #4CAF50;
+                box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+            }
+            body.dark tr.selected {
+                background-color: #2d4a2d !important;
+                border-left: 4px solid #66bb6a;
+                box-shadow: 0 2px 8px rgba(102, 187, 106, 0.3);
+            }
+            .row-alert {
+                background-color: #ffebee !important;
+                color: #b00020;
+            }
+            .row-replicar-old {
+                background-color: #e3f2fd !important;
+                color: #0d47a1 !important;
+            }
+            .loading {
+                text-align: center;
+                padding: 20px;
+                font-style: italic;
+                color: #666;
+            }
+            .error {
+                color: red;
+                text-align: center;
+                padding: 20px;
+            }
+            .table-container {
+                overflow-x: auto;
+                overflow-y: auto;
+                height: calc(100vh - 160px);
+                -webkit-overflow-scrolling: touch;
+            }
+            /* Scrollbar (WebKit) */
+            .table-container::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+            .table-container::-webkit-scrollbar-track {
+                background: #eee;
+                border-radius: 8px;
+            }
+            .table-container::-webkit-scrollbar-thumb {
+                background: #bbb;
+                border-radius: 8px;
+            }
+            .table-container::-webkit-scrollbar-thumb:hover {
+                background: #a6a6a6;
+            }
+            @media (max-width: 1024px) {
+                th, td { min-width: 120px; }
+            }
+            @media (max-width: 768px) {
+                body { padding: 12px; }
+                .filters { padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; }
+                .filter-row { gap: 10px; }
+                .filter-input { font-size: 14px; height: 40px; }
+                th, td { min-width: 110px; padding: 6px; }
+            }
+            @media (max-width: 480px) {
+                .filter-input { font-size: 14px; height: 38px; }
+                th, td { min-width: 100px; }
+            }
+            /* Tema escuro overrides */
+            body.dark {
+                background-color: #0f1115;
+                color: #e0e6f0;
+            }
+            body.dark .filters {
+                background-color: #141821;
+                box-shadow: none;
+                border: 1px solid #2a3445;
+            }
+            body.dark .filter-input {
+                background-color: #0f1115;
+                border-color: #2a3445;
+                color: #e0e6f0;
+            }
+            body.dark .filter-input::placeholder {
+                color: #8aa1b7;
+            }
+            body.dark .filter-input:focus {
+                border-color: #2e7d32;
+                box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+                background-color: #0f1115;
+            }
+            body.dark .filter-btn {
+                background-color: #8b7afc;
+            }
+            body.dark .filter-btn:hover {
+                background-color: #7a69f2;
+            }
+            body.dark .clear-btn {
+                background-color: #c62828;
+            }
+            body.dark .clear-btn:hover {
+                background-color: #8e0000;
+            }
+            body.dark table {
+                background-color: #141821;
+                box-shadow: none;
+            }
+            body.dark th {
+                background-color: #8b7afc;
+                color: #e0e6f0;
+            }
+            body.dark th.sortable:hover { background-color: #7a69f2; }
+            body.dark td, body.dark th {
+                border-bottom: 1px solid #2a3445;
+            }
+            body.dark tr:hover {
+                background-color: #1b2130;
+            }
+            body.dark .row-alert {
+                background-color: #3b0d0d !important;
+                color: #ff6b6b !important;
+            }
+            body.dark .row-replicar-old {
+                background-color: #0d2538 !important;
+                color: #90caf9 !important;
+            }
+            body.dark .table-container::-webkit-scrollbar-track {
+                background: #1e2633;
+            }
+            body.dark .table-container::-webkit-scrollbar-thumb {
+                background: #2a3445;
+            }
+            body.dark .table-container::-webkit-scrollbar-thumb:hover {
+                background: #3c4a5e;
+            }
+            /* Painel de colunas */
+            .columns-panel {
+                display: none;
+                position: absolute;
+                right: 16px;
+                top: 66px;
+                background: #fff;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+                padding: 10px;
+                width: 280px;
+                z-index: 20;
+            }
+            .columns-panel.open { display: block; }
+            .columns-panel h3 { margin: 6px 0 8px; font-size: 14px; }
+            .columns-list { max-height: 260px; overflow-y: auto; padding-right: 6px; }
+            .columns-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+            .drag-handle { cursor: grab; user-select: none; color: #666; }
+            .columns-actions { display: flex; justify-content: space-between; margin-top: 8px; }
+            .columns-actions button { padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; background: #fafafa; cursor: pointer; }
+            .columns-actions button:hover { background: #f0f0ff; border-color: #cbd0ff; }
+            body.dark .columns-panel { background: #141821; border-color: #2a3445; }
+            body.dark .columns-actions button { background: #0f1115; border-color: #2a3445; color: #e0e6f0; }
+            body.dark .columns-actions button:hover { background: #1b2130; }
+        </style>
 </head>
 <body>
     <div class="container">
@@ -373,22 +400,32 @@
         ];
         const STORAGE_ORDER = 'dashboard.columnsOrder';
         const STORAGE_VISIBLE = 'dashboard.visibleColumns';
+        const STORAGE_WIDTHS = 'dashboard.columnWidths';
         let columnsOrder = [];
         let visibleColumns = new Set();
+        let columnWidths = {};
+        let isResizing = false;
+        let resizingJustEnded = false;
+        let visibleKeysOrder = [];
         
         function loadColumnPrefs() {
           try {
             const savedOrder = JSON.parse(localStorage.getItem(STORAGE_ORDER) || 'null');
             const savedVisible = JSON.parse(localStorage.getItem(STORAGE_VISIBLE) || 'null');
+            const savedWidths = JSON.parse(localStorage.getItem(STORAGE_WIDTHS) || '{}');
             const defaultOrder = defaultColumns.map(c => c.key);
             columnsOrder = Array.isArray(savedOrder) ? savedOrder.filter(k => defaultOrder.includes(k)) : defaultOrder;
             visibleColumns = new Set(Array.isArray(savedVisible) ? savedVisible.filter(k => defaultOrder.includes(k)) : defaultOrder);
+            // Sanitize widths map
+            columnWidths = (savedWidths && typeof savedWidths === 'object') ? savedWidths : {};
+            Object.keys(columnWidths).forEach(k => { if (!defaultOrder.includes(k)) delete columnWidths[k]; });
             // Salvaguarda: evitar estado sem colunas visíveis ou sem ordem
             if (!columnsOrder.length) columnsOrder = defaultOrder;
             if (visibleColumns.size === 0) visibleColumns = new Set(defaultOrder);
           } catch (_) {
             columnsOrder = defaultColumns.map(c => c.key);
             visibleColumns = new Set(columnsOrder);
+            columnWidths = {};
           }
         }
         function saveColumnPrefs() {
@@ -400,6 +437,7 @@
           if (!theadRow) return;
           theadRow.innerHTML = '';
           const frag = document.createDocumentFragment();
+          visibleKeysOrder = [];
           columnsOrder.forEach(key => {
             if (!visibleColumns.has(key)) return;
             const col = defaultColumns.find(c => c.key === key);
@@ -408,11 +446,54 @@
             th.dataset.key = key;
             th.draggable = true;
             th.textContent = col ? col.label : key;
+            // aplicar largura persistida
+            if (columnWidths[key]) th.style.width = columnWidths[key] + 'px';
             const span = document.createElement('span');
             span.className = 'sort-indicator';
             th.appendChild(document.createTextNode(' '));
             th.appendChild(span);
+            // adicionar handle de resize
+            const resizer = document.createElement('span');
+            resizer.className = 'col-resizer';
+            resizer.title = 'Arraste para redimensionar';
+            resizer.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
+            resizer.addEventListener('mousedown', (e) => {
+              e.stopPropagation();
+              isResizing = true;
+              const startX = e.clientX;
+              const startWidth = th.getBoundingClientRect().width;
+              document.body.style.cursor = 'col-resize';
+              document.body.classList.add('no-select');
+              const onMouseMove = (ev) => {
+                const delta = ev.clientX - startX;
+                const newWidth = Math.max(80, Math.round(startWidth + delta));
+                th.style.width = newWidth + 'px';
+                columnWidths[key] = newWidth;
+                // aplicar aos tds existentes
+                const colIndex = visibleKeysOrder.indexOf(key);
+                if (colIndex >= 0) {
+                  document.querySelectorAll('#lojasTableBody tr').forEach(tr => {
+                    const cell = tr.children[colIndex];
+                    if (cell) cell.style.width = newWidth + 'px';
+                  });
+                }
+              };
+              const onMouseUp = () => {
+                isResizing = false;
+                resizingJustEnded = true;
+                setTimeout(() => { resizingJustEnded = false; }, 120);
+                document.body.style.cursor = '';
+                document.body.classList.remove('no-select');
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                try { localStorage.setItem(STORAGE_WIDTHS, JSON.stringify(columnWidths)); } catch (_) {}
+              };
+              document.addEventListener('mousemove', onMouseMove);
+              document.addEventListener('mouseup', onMouseUp);
+            });
+            th.appendChild(resizer);
             frag.appendChild(th);
+            visibleKeysOrder.push(key);
           });
           theadRow.appendChild(frag);
           setupSorting();
@@ -424,6 +505,10 @@
           let draggedKey = null;
           headers.forEach(th => {
             th.addEventListener('dragstart', (e) => {
+              if (isResizing || (e.target && e.target.classList && e.target.classList.contains('col-resizer'))) {
+                e.preventDefault();
+                return;
+              }
               draggedKey = th.dataset.key;
               e.dataTransfer.effectAllowed = 'move';
             });
@@ -433,6 +518,7 @@
             });
             th.addEventListener('drop', (e) => {
               e.preventDefault();
+              if (isResizing || (e.target && e.target.classList && e.target.classList.contains('col-resizer'))) return;
               const targetKey = th.dataset.key;
               if (!draggedKey || !targetKey || draggedKey === targetKey) return;
               const from = columnsOrder.indexOf(draggedKey);
@@ -544,7 +630,24 @@
             
             try {
                 const response = await fetch('/lojas?limit=10000');
-                const data = await response.json();
+                let data;
+                if (response.ok) {
+                    data = await response.json();
+                } else {
+                    let msg = 'Serviço indisponível';
+                    const ct = response.headers.get('content-type') || '';
+                    if (ct.includes('application/json')) {
+                        try {
+                            const errJson = await response.json();
+                            if (errJson && errJson.errors && errJson.errors[0] && errJson.errors[0].message) {
+                                msg = errJson.errors[0].message;
+                            }
+                        } catch {}
+                    } else {
+                        msg = `Serviço indisponível (${response.status} ${response.statusText})`;
+                    }
+                    throw new Error(msg);
+                }
                 
                 if (data.success) {
                     allLojas = data.result;
@@ -593,19 +696,27 @@
             lojas.forEach(loja => {
                 const row = document.createElement('tr');
                 const cells = [];
+                const keysRendered = [];
                 columnsOrder.forEach(key => {
                   if (!visibleColumns.has(key)) return;
+                  keysRendered.push(key);
                   if (numericKeys.has(key)) {
                     const v = loja[key];
-                    cells.push(`<td>${v !== undefined && v !== null ? v : ''}</td>`);
+                    const td = document.createElement('td');
+                    td.textContent = (v !== undefined && v !== null) ? String(v) : '';
+                    if (columnWidths[key]) td.style.width = columnWidths[key] + 'px';
+                    row.appendChild(td);
                   } else {
-                    cells.push(`<td>${loja[key] || ''}</td>`);
+                    const td = document.createElement('td');
+                    td.textContent = loja[key] || '';
+                    if (columnWidths[key]) td.style.width = columnWidths[key] + 'px';
+                    row.appendChild(td);
                   }
                 });
-                row.innerHTML = cells.join('');
                 
                 // Adicionar event listener para seleção de linha
                 row.addEventListener('click', function(e) {
+                    if (e.target && e.target.classList && e.target.classList.contains('col-resizer')) return;
                     // Remover seleção de todas as outras linhas
                     document.querySelectorAll('#lojasTableBody tr.selected').forEach(r => {
                         r.classList.remove('selected');
@@ -725,7 +836,8 @@
         }
         function setupSorting() {
             const headers = document.querySelectorAll('#lojasTable thead th.sortable');
-            headers.forEach(th => th.addEventListener('click', () => {
+            headers.forEach(th => th.addEventListener('click', (e) => {
+                if (isResizing || resizingJustEnded || (e.target && e.target.classList && e.target.classList.contains('col-resizer'))) return;
                 const key = th.dataset.key;
                 if (!key) return;
                 if (currentSort.key === key) {
