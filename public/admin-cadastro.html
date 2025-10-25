@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Cadastro de Loja - Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            color: #555;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            flex: 100%;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group label.required::after {
+            content: " *";
+            color: red;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            display: none;
+        }
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .alert-error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="pageHeader">🏪 Cadastro de Loja</h1>
+        
+        <div id="alert" class="alert"></div>
+        <div id="loading" class="loading">Salvando loja...</div>
+        
+        <form id="lojaForm">
+            <!-- Seção: Informações Básicas -->
+            <div class="form-section">
+                <h3>Informações Básicas</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="banco" class="required">Banco</label>
+                        <input type="text" id="banco" name="banco" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="idloja" class="required">ID da Loja</label>
+                        <input type="number" id="idloja" name="idloja" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="loja">Nome da Loja</label>
+                        <input type="text" id="loja" name="loja">
+                    </div>
+                    <div class="form-group">
+                        <label for="fantasia">Nome Fantasia</label>
+                        <input type="text" id="fantasia" name="fantasia">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome">Razão Social</label>
+                        <input type="text" id="nome" name="nome">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="">Selecione...</option>
+                            <option value="1">Ativo</option>
+                            <option value="0">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Documentos -->
+            <div class="form-section">
+                <h3>Documentos</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cnpj">CNPJ</label>
+                        <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00">
+                    </div>
+                    <div class="form-group">
+                        <label for="ie">Inscrição Estadual</label>
+                        <input type="text" id="ie" name="ie">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Endereço -->
+            <div class="form-section">
+                <h3>Endereço</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cep">CEP</label>
+                        <input type="text" id="cep" name="cep" placeholder="00000-000">
+                    </div>
+                    <div class="form-group">
+                        <label for="logradouro">Logradouro</label>
+                        <input type="text" id="logradouro" name="logradouro">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="numero">Número</label>
+                        <input type="text" id="numero" name="numero">
+                    </div>
+                    <div class="form-group">
+                        <label for="complemento">Complemento</label>
+                        <input type="text" id="complemento" name="complemento">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bairro">Bairro</label>
+                        <input type="text" id="bairro" name="bairro">
+                    </div>
+                    <div class="form-group">
+                        <label for="cidade">Cidade</label>
+                        <input type="text" id="cidade" name="cidade">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="uf">UF</label>
+                        <select id="uf" name="uf">
+                            <option value="">Selecione...</option>
+                            <option value="AC">AC</option>
+                            <option value="AL">AL</option>
+                            <option value="AP">AP</option>
+                            <option value="AM">AM</option>
+                            <option value="BA">BA</option>
+                            <option value="CE">CE</option>
+                            <option value="DF">DF</option>
+                            <option value="ES">ES</option>
+                            <option value="GO">GO</option>
+                            <option value="MA">MA</option>
+                            <option value="MT">MT</option>
+                            <option value="MS">MS</option>
+                            <option value="MG">MG</option>
+                            <option value="PA">PA</option>
+                            <option value="PB">PB</option>
+                            <option value="PR">PR</option>
+                            <option value="PE">PE</option>
+                            <option value="PI">PI</option>
+                            <option value="RJ">RJ</option>
+                            <option value="RN">RN</option>
+                            <option value="RS">RS</option>
+                            <option value="RO">RO</option>
+                            <option value="RR">RR</option>
+                            <option value="SC">SC</option>
+                            <option value="SP">SP</option>
+                            <option value="SE">SE</option>
+                            <option value="TO">TO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fone">Telefone</label>
+                        <input type="text" id="fone" name="fone" placeholder="(00) 0000-0000">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Acesso -->
+            <div class="form-section">
+                <h3>Acesso e Configurações</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="login">Login</label>
+                        <input type="text" id="login" name="login">
+                    </div>
+                    <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="versao">Versão</label>
+                        <input type="text" id="versao" name="versao">
+                    </div>
+                    <div class="form-group">
+                        <label for="instalado">Instalado</label>
+                        <input type="text" id="instalado" name="instalado">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Contato -->
+            <div class="form-section">
+                <h3>Contato</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="contato">Contato</label>
+                        <input type="text" id="contato" name="contato">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nomedocontato">Nome do Contato</label>
+                        <input type="text" id="nomedocontato" name="nomedocontato">
+                    </div>
+                    <div class="form-group">
+                        <label for="codigodaloja">Código da Loja</label>
+                        <input type="text" id="codigodaloja" name="codigodaloja">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Configurações Fiscais -->
+            <div class="form-section">
+                <h3>Configurações Fiscais</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regime">Regime Tributário</label>
+                        <select id="regime" name="regime">
+                            <option value="">Selecione...</option>
+                            <option value="simples">Simples Nacional</option>
+                            <option value="presumido">Lucro Presumido</option>
+                            <option value="real">Lucro Real</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ambiente">Ambiente</label>
+                        <select id="ambiente" name="ambiente">
+                            <option value="">Selecione...</option>
+                            <option value="producao">Produção</option>
+                            <option value="homologacao">Homologação</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="icmscredito">ICMS Crédito (%)</label>
+                        <input type="number" id="icmscredito" name="icmscredito" step="0.01" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="federal">Federal (%)</label>
+                        <input type="number" id="federal" name="federal" step="0.01" min="0" max="100">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="estadual">Estadual (%)</label>
+                        <input type="number" id="estadual" name="estadual" step="0.01" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="mensalidade">Mensalidade</label>
+                        <input type="number" id="mensalidade" name="mensalidade" step="0.01" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Observações -->
+            <div class="form-section">
+                <h3>Observações</h3>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="obs">Observações</label>
+                        <textarea id="obs" name="obs" placeholder="Digite observações adicionais..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary" onclick="voltarParaListagem()">
+                    ← Voltar para Listagem
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Cadastrar Loja
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="limparFormulario()">
+                    Limpar Formulário
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let isEditMode = false;
+        let editBanco = '';
+        let editIdLoja = '';
+
+        // Detectar parâmetros da URL ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const banco = urlParams.get('banco');
+            const idloja = urlParams.get('idloja');
+            const edit = urlParams.get('edit');
+
+            if (edit === 'true' && banco && idloja) {
+                isEditMode = true;
+                editBanco = banco;
+                editIdLoja = parseInt(idloja);
+                
+                // Alterar interface para modo de edição
+                document.getElementById('pageTitle').textContent = 'Edição de Loja - Admin';
+                document.getElementById('pageHeader').textContent = '✏️ Editar Loja';
+                document.getElementById('submitBtn').textContent = 'Atualizar Loja';
+                
+                // Carregar dados da loja
+                carregarDadosLoja(banco, idloja);
+            }
+        });
+
+        // Função para carregar dados da loja para edição
+        async function carregarDadosLoja(banco, idloja) {
+            try {
+                mostrarLoading(true);
+                
+                const url = `/lojas/${encodeURIComponent(banco)}/${idloja}`;
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    preencherFormulario(result.result);
+                    mostrarAlerta('Dados da loja carregados para edição.', 'success');
+                } else {
+                    throw new Error(result.errors?.[0]?.message || 'Erro ao carregar dados da loja');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar loja:', error);
+                mostrarAlerta('Erro ao carregar dados da loja: ' + error.message, 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Função para preencher o formulário com dados da loja
+        function preencherFormulario(loja) {
+            // Mapeamento entre campos da API e IDs dos elementos do formulário
+            const camposMapeados = {
+                'banco': 'banco',
+                'idloja': 'idloja',
+                'loja': 'loja',
+                'nomefantasia': 'fantasia',
+                'razaosocial': 'nome',
+                'status': 'status',
+                'cnpj': 'cnpj',
+                'inscricaoestadual': 'inscricaoestadual',
+                'inscricaomunicipal': 'inscricaomunicipal',
+                'endereco': 'endereco',
+                'numero': 'numero',
+                'complemento': 'complemento',
+                'bairro': 'bairro',
+                'cidade': 'cidade',
+                'estado': 'estado',
+                'cep': 'cep',
+                'telefone': 'telefone',
+                'email': 'email',
+                'site': 'site',
+                'observacoes': 'observacoes'
+            };
+
+            // Preencher campos do formulário
+            for (const [campoApi, idElemento] of Object.entries(camposMapeados)) {
+                const elemento = document.getElementById(idElemento);
+                if (elemento && loja[campoApi] !== null && loja[campoApi] !== undefined) {
+                    elemento.value = loja[campoApi];
+                }
+            }
+
+            // Desabilitar campos chave no modo de edição
+            if (isEditMode) {
+                document.getElementById('banco').disabled = true;
+                document.getElementById('idloja').disabled = true;
+            }
+        }
+
+        // Função para voltar à listagem
+        function voltarParaListagem() {
+            window.location.href = '/admin';
+        }
+
+        // Função para mostrar loading
+        function mostrarLoading(show) {
+            const submitBtn = document.getElementById('submitBtn');
+            if (show) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = isEditMode ? 'Atualizando...' : 'Cadastrando...';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.textContent = isEditMode ? 'Atualizar Loja' : 'Cadastrar Loja';
+            }
+        }
+        // Função para mostrar alertas
+        function mostrarAlerta(mensagem, tipo) {
+            const alert = document.getElementById('alert');
+            alert.textContent = mensagem;
+            alert.className = `alert alert-${tipo}`;
+            alert.style.display = 'block';
+            
+            // Esconder após 5 segundos
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Função para mostrar/esconder loading
+        function mostrarLoading(mostrar) {
+            document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
+        }
+
+        // Função para limpar formulário
+        function limparFormulario() {
+            document.getElementById('lojaForm').reset();
+            document.getElementById('alert').style.display = 'none';
+        }
+
+        // Função para validar campos obrigatórios
+        function validarFormulario() {
+            const banco = document.getElementById('banco').value.trim();
+            const idloja = document.getElementById('idloja').value.trim();
+            
+            if (!banco) {
+                mostrarAlerta('O campo Banco é obrigatório.', 'error');
+                return false;
+            }
+            
+            if (!idloja) {
+                mostrarAlerta('O campo ID da Loja é obrigatório.', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Função para coletar dados do formulário
+        function coletarDadosFormulario() {
+            const formData = new FormData(document.getElementById('lojaForm'));
+            const dados = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (value.trim() !== '') {
+                    // Converter números
+                    if (['idloja', 'status', 'idcidade', 'iduf', 'modelo', 'serie', 'nf', 'pedido', 'ordem', 'romaneio', 'michel'].includes(key)) {
+                        dados[key] = parseInt(value);
+                    }
+                    // Converter decimais
+                    else if (['icmscredito', 'federal', 'estadual', 'mensalidade'].includes(key)) {
+                        dados[key] = parseFloat(value);
+                    }
+                    // Manter como string
+                    else {
+                        dados[key] = value;
+                    }
+                }
+            }
+            
+            return dados;
+        }
+
+        // Submissão do formulário
+        document.getElementById('lojaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validarFormulario()) {
+                return;
+            }
+            
+            mostrarLoading(true);
+            
+            try {
+                const dados = coletarDadosFormulario();
+                
+                let response;
+                if (isEditMode) {
+                    // Modo de edição - usar PUT
+                    response = await fetch(`/lojas/${encodeURIComponent(editBanco)}/${editIdLoja}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dados)
+                    });
+                } else {
+                    // Modo de cadastro - usar POST
+                    response = await fetch('/lojas', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dados)
+                    });
+                }
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    const successMsg = isEditMode ? 'Loja atualizada com sucesso!' : 'Loja cadastrada com sucesso!';
+                    mostrarAlerta(successMsg, 'success');
+                    
+                    if (!isEditMode) {
+                        limparFormulario();
+                    }
+                    
+                    // Redirecionar para listagem após 2 segundos
+                    setTimeout(() => {
+                        voltarParaListagem();
+                    }, 2000);
+                } else {
+                    const errorMsg = result.errors && result.errors.length > 0 
+                        ? result.errors[0].message 
+                        : (isEditMode ? 'Erro ao atualizar loja' : 'Erro ao cadastrar loja');
+                    mostrarAlerta(errorMsg, 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarAlerta('Erro de conexão. Tente novamente.', 'error');
+            } finally {
+                mostrarLoading(false);
+            }
+        });
+
+        // Máscara para CNPJ
+        document.getElementById('cnpj').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+            value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+            e.target.value = value;
+        });
+
+        // Máscara para CEP
+        document.getElementById('cep').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+            e.target.value = value;
+        });
+
+        // Máscara para telefone
+        document.getElementById('fone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/^(\d{2})(\d)/, '($1) $2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

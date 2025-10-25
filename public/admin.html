@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gerenciamento de Lojas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .toolbar {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-input {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-input::placeholder {
+            color: #6c757d;
+        }
+
+        .clear-filter {
+            padding: 10px 15px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .clear-filter:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(86, 171, 47, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 65, 108, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 13px;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            margin: 20px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .selected-count {
+            background: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 6px;
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-container {
+                order: 2;
+                justify-content: center;
+            }
+            
+            .filter-input {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .table-container {
+                padding: 15px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th,
+            .table td {
+                padding: 8px 6px;
+            }
+
+            .actions {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .btn-sm {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏪 Gerenciamento de Lojas</h1>
+            <p>Sistema de administração e controle de lojas</p>
+        </div>
+
+        <div class="toolbar">
+            <div>
+                <a href="/admin/cadastro" class="btn btn-primary">
+                    ➕ Incluir Nova Loja
+                </a>
+                <button id="btnControleMensalidades" class="btn btn-success" onclick="controlarMensalidades()">
+                    💰 Controlar Mensalidades
+                </button>
+            </div>
+            
+            <div class="filter-container">
+                <input type="text" 
+                       id="filterInput" 
+                       class="filter-input" 
+                       placeholder="🔍 Buscar por banco, loja, CNPJ ou nome..."
+                       oninput="filtrarLojas()">
+                <button class="clear-filter" onclick="limparFiltro()">
+                    ✕ Limpar
+                </button>
+            </div>
+            
+            <div id="selectedCount" class="selected-count" style="display: none;">
+                0 lojas selecionadas
+            </div>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="table-container">
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Carregando lojas...</p>
+            </div>
+
+            <table id="lojasTable" class="table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAll" class="checkbox" onchange="toggleSelectAll()">
+                        </th>
+                        <th>ID</th>
+                        <th>Banco</th>
+                        <th>ID Loja</th>
+                        <th>Nome</th>
+                        <th>CNPJ</th>
+                        <th>Cidade</th>
+                        <th>Status</th>
+                        <th>Mensalidade</th>
+                        <th>Vencimento</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="lojasTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let lojas = [];
+        let lojasFiltradas = [];
+        let selectedLojas = new Set();
+
+        // Carregar lojas ao inicializar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarLojas();
+        });
+
+        async function carregarLojas() {
+            try {
+                showLoading(true);
+                const response = await fetch('/lojas');
+                const data = await response.json();
+
+                if (data.success) {
+                    lojas = data.result;
+                    lojasFiltradas = [...lojas]; // Cópia inicial
+                    renderizarTabela();
+                    showAlert('Lojas carregadas com sucesso!', 'success');
+                } else {
+                    throw new Error('Erro ao carregar lojas');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar lojas:', error);
+                showAlert('Erro ao carregar lojas: ' + error.message, 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function filtrarLojas() {
+            const filtro = document.getElementById('filterInput').value.toLowerCase().trim();
+            
+            if (filtro === '') {
+                lojasFiltradas = [...lojas];
+            } else {
+                lojasFiltradas = lojas.filter(loja => {
+                    const banco = (loja.banco || '').toLowerCase();
+                    const nomeLoja = (loja.loja || loja.nome || loja.fantasia || '').toLowerCase();
+                    const cnpj = (loja.cnpj || '').replace(/[^\d]/g, ''); // Remove formatação do CNPJ
+                    const filtroLimpo = filtro.replace(/[^\d]/g, ''); // Remove formatação do filtro para CNPJ
+                    
+                    return banco.includes(filtro) ||
+                           nomeLoja.includes(filtro) ||
+                           cnpj.includes(filtroLimpo) ||
+                           (loja.idloja && loja.idloja.toString().includes(filtro));
+                });
+            }
+            
+            renderizarTabela();
+            
+            // Mostrar contador de resultados
+            const totalFiltradas = lojasFiltradas.length;
+            const totalLojas = lojas.length;
+            
+            if (filtro !== '' && totalFiltradas !== totalLojas) {
+                showAlert(`Mostrando ${totalFiltradas} de ${totalLojas} lojas`, 'success');
+            }
+        }
+
+        function limparFiltro() {
+            document.getElementById('filterInput').value = '';
+            lojasFiltradas = [...lojas];
+            renderizarTabela();
+        }
+
+        function renderizarTabela() {
+            const tbody = document.getElementById('lojasTableBody');
+            tbody.innerHTML = '';
+
+            lojasFiltradas.forEach(loja => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <input type="checkbox" class="checkbox loja-checkbox" 
+                               value="${loja.banco}-${loja.idloja}" 
+                               onchange="toggleLojaSelection('${loja.banco}', ${loja.idloja})">
+                    </td>
+                    <td>${loja.id || '-'}</td>
+                    <td>${loja.banco || '-'}</td>
+                    <td>${loja.idloja || '-'}</td>
+                    <td>${loja.loja || loja.nome || loja.fantasia || '-'}</td>
+                    <td>${loja.cnpj || '-'}</td>
+                    <td>${loja.cidade || '-'}</td>
+                    <td>
+                        <span style="color: ${loja.status === 1 ? '#28a745' : '#dc3545'};">
+                            ${loja.status === 1 ? '✅ Ativo' : '❌ Inativo'}
+                        </span>
+                    </td>
+                    <td>${loja.mensalidade ? 'R$ ' + parseFloat(loja.mensalidade).toFixed(2) : '-'}</td>
+                    <td>${loja.vencimento || '-'}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-warning btn-sm" onclick="editarLoja('${loja.banco}', ${loja.idloja})">
+                                ✏️ Editar
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="excluirLoja('${loja.banco}', ${loja.idloja}, '${loja.loja || loja.nome || 'Loja'}')">
+                                🗑️ Excluir
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.loja-checkbox');
+            
+            selectedLojas.clear();
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+                if (selectAll.checked) {
+                    const [banco, idloja] = checkbox.value.split('-');
+                    selectedLojas.add(`${banco}-${idloja}`);
+                }
+            });
+            
+            updateSelectedCount();
+        }
+
+        function toggleLojaSelection(banco, idloja) {
+            const key = `${banco}-${idloja}`;
+            const checkbox = document.querySelector(`input[value="${key}"]`);
+            
+            if (checkbox.checked) {
+                selectedLojas.add(key);
+            } else {
+                selectedLojas.delete(key);
+                document.getElementById('selectAll').checked = false;
+            }
+            
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const count = selectedLojas.size;
+            const countElement = document.getElementById('selectedCount');
+            
+            if (count > 0) {
+                countElement.textContent = `${count} loja${count > 1 ? 's' : ''} selecionada${count > 1 ? 's' : ''}`;
+                countElement.style.display = 'block';
+                document.getElementById('btnControleMensalidades').disabled = false;
+            } else {
+                countElement.style.display = 'none';
+                document.getElementById('btnControleMensalidades').disabled = true;
+            }
+        }
+
+        function editarLoja(banco, idloja) {
+            // Redirecionar para página de edição (pode ser a mesma de cadastro com parâmetros)
+            window.location.href = `/admin/cadastro?banco=${encodeURIComponent(banco)}&idloja=${idloja}&edit=true`;
+        }
+
+        async function excluirLoja(banco, idloja, nomeLoja) {
+            if (!confirm(`Tem certeza que deseja excluir a loja "${nomeLoja}"?\n\nEsta ação não pode ser desfeita.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/lojas/${encodeURIComponent(banco)}/${idloja}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(`Loja "${nomeLoja}" excluída com sucesso!`, 'success');
+                    await carregarLojas(); // Recarregar a lista
+                } else {
+                    throw new Error(data.errors?.[0]?.message || 'Erro ao excluir loja');
+                }
+            } catch (error) {
+                console.error('Erro ao excluir loja:', error);
+                showAlert('Erro ao excluir loja: ' + error.message, 'danger');
+            }
+        }
+
+        async function controlarMensalidades() {
+            if (selectedLojas.size === 0) {
+                showAlert('Selecione pelo menos uma loja para controlar as mensalidades.', 'danger');
+                return;
+            }
+
+            const count = selectedLojas.size;
+            if (!confirm(`Atualizar o vencimento para o dia 10 do próximo mês para ${count} loja${count > 1 ? 's' : ''} selecionada${count > 1 ? 's' : ''}?`)) {
+                return;
+            }
+
+            try {
+                // Calcular data do próximo mês, dia 10
+                const proximoMes = new Date();
+                proximoMes.setMonth(proximoMes.getMonth() + 1);
+                proximoMes.setDate(10);
+                const novoVencimento = proximoMes.toISOString().split('T')[0]; // YYYY-MM-DD
+
+                let sucessos = 0;
+                let erros = 0;
+
+                for (const lojaKey of selectedLojas) {
+                    const [banco, idloja] = lojaKey.split('-');
+                    
+                    try {
+                        const response = await fetch(`/lojas/${encodeURIComponent(banco)}/${idloja}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                vencimento: novoVencimento
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            sucessos++;
+                        } else {
+                            erros++;
+                            console.error(`Erro ao atualizar loja ${banco}-${idloja}:`, data.errors);
+                        }
+                    } catch (error) {
+                        erros++;
+                        console.error(`Erro ao atualizar loja ${banco}-${idloja}:`, error);
+                    }
+                }
+
+                if (sucessos > 0) {
+                    showAlert(`${sucessos} loja${sucessos > 1 ? 's' : ''} atualizada${sucessos > 1 ? 's' : ''} com sucesso! Vencimento definido para ${novoVencimento}.`, 'success');
+                }
+                
+                if (erros > 0) {
+                    showAlert(`${erros} loja${erros > 1 ? 's' : ''} não puderam ser atualizadas. Verifique o console para detalhes.`, 'danger');
+                }
+
+                // Limpar seleção e recarregar dados
+                selectedLojas.clear();
+                document.getElementById('selectAll').checked = false;
+                updateSelectedCount();
+                await carregarLojas();
+
+            } catch (error) {
+                console.error('Erro no controle de mensalidades:', error);
+                showAlert('Erro no controle de mensalidades: ' + error.message, 'danger');
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('lojasTable').style.display = show ? 'none' : 'table';
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            // Remover o alerta após 5 segundos
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
