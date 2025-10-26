@@ -5,6 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Gerenciamento de Lojas</title>
     <style>
+        :root {
+            /* Light theme variables */
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-container: white;
+            --bg-header: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --bg-toolbar: #f8f9fa;
+            --bg-table-header: #f8f9fa;
+            --bg-table-row: white;
+            --bg-table-row-hover: #f8f9fa;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-white: white;
+            --border-color: #e9ecef;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme variables */
+            --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --bg-container: #2d3748;
+            --bg-header: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            --bg-toolbar: #1a202c;
+            --bg-table-header: #1a202c;
+            --bg-table-row: #2d3748;
+            --bg-table-row-hover: #4a5568;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --text-white: #e2e8f0;
+            --border-color: #4a5568;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,23 +45,24 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-primary);
             min-height: 100vh;
             padding: 20px;
+            color: var(--text-primary);
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
+            background: var(--bg-container);
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px var(--shadow-color);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
+            background: var(--bg-header);
+            color: var(--text-white);
             padding: 30px;
             text-align: center;
         }
@@ -46,13 +79,21 @@
 
         .toolbar {
             padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
+            background: var(--bg-toolbar);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
+        }
+
+        .toolbar-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-left: auto;
         }
 
         .filter-container {
@@ -64,11 +105,13 @@
 
         .filter-input {
             padding: 10px 15px;
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 14px;
             width: 250px;
             transition: all 0.3s ease;
+            background: var(--bg-container);
+            color: var(--text-primary);
         }
 
         .filter-input:focus {
@@ -78,7 +121,7 @@
         }
 
         .filter-input::placeholder {
-            color: #6c757d;
+            color: var(--text-secondary);
         }
 
         .clear-filter {
@@ -112,43 +155,43 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            background: linear-gradient(135deg, #2196f3 0%, #0d47a1 100%);
             color: white;
         }
 
         .btn-success:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(86, 171, 47, 0.4);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
             color: white;
         }
 
         .btn-danger:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 65, 108, 0.4);
+            box-shadow: 0 8px 25px rgba(30, 136, 229, 0.4);
         }
 
         .btn-warning {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #42a5f5 0%, #1976d2 100%);
             color: white;
         }
 
         .btn-warning:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+            box-shadow: 0 8px 25px rgba(66, 165, 245, 0.4);
         }
 
         .btn-sm {
@@ -159,34 +202,76 @@
         .table-container {
             padding: 30px;
             overflow-x: auto;
+            max-height: 70vh;
+            overflow-y: auto;
+            position: relative;
         }
 
         .table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            background: var(--bg-table-row);
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px var(--shadow-color);
         }
 
         .table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--bg-header);
+            color: var(--text-white);
             padding: 15px 12px;
             text-align: left;
             font-weight: 600;
             font-size: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .table th.sortable:hover {
+            opacity: 0.8;
+        }
+
+        .sort-indicator {
+            margin-left: 5px;
+            font-size: 14px;
+            opacity: 1;
+            color: var(--text-white);
+            font-weight: bold;
+        }
+
+        .sort-indicator.asc::after {
+            content: "▲";
+            color: var(--text-white);
+            text-shadow: 0 0 4px rgba(255, 255, 255, 0.9);
+        }
+
+        .sort-indicator.desc::after {
+            content: "▼";
+            color: var(--text-white);
+            text-shadow: 0 0 4px rgba(255, 255, 255, 0.9);
         }
 
         .table td {
             padding: 12px;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--border-color);
             font-size: 13px;
+            color: var(--text-primary);
+            background: var(--bg-table-row);
         }
 
         .table tbody tr:hover {
-            background-color: #f8f9fa;
+            background-color: var(--bg-table-row-hover);
+        }
+
+        .table tbody tr:hover td {
+            background-color: var(--bg-table-row-hover);
         }
 
         .table tbody tr:last-child td {
@@ -302,15 +387,6 @@
         </div>
 
         <div class="toolbar">
-            <div>
-                <a href="/admin/cadastro" class="btn btn-primary">
-                    ➕ Incluir Nova Loja
-                </a>
-                <button id="btnControleMensalidades" class="btn btn-success" onclick="controlarMensalidades()">
-                    💰 Controlar Mensalidades
-                </button>
-            </div>
-            
             <div class="filter-container">
                 <input type="text" 
                        id="filterInput" 
@@ -324,6 +400,21 @@
             
             <div id="selectedCount" class="selected-count" style="display: none;">
                 0 lojas selecionadas
+            </div>
+            
+            <div class="toolbar-buttons">
+                <a href="/admin/cadastro" class="btn btn-primary">
+                    ➕ Incluir Nova Loja
+                </a>
+                <button id="btnControleMensalidades" class="btn btn-success" onclick="controlarMensalidades()">
+                    💰 Controlar Mensalidades
+                </button>
+                <button id="themeToggle" class="btn btn-warning" onclick="toggleTheme()">
+                    🌙 Tema Escuro
+                </button>
+                <button id="logoutBtn" class="btn btn-danger" onclick="logout()">
+                    🚪 Sair
+                </button>
             </div>
         </div>
 
@@ -341,15 +432,30 @@
                         <th>
                             <input type="checkbox" id="selectAll" class="checkbox" onchange="toggleSelectAll()">
                         </th>
-                        <th>ID</th>
-                        <th>Banco</th>
-                        <th>ID Loja</th>
-                        <th>Nome</th>
-                        <th>CNPJ</th>
-                        <th>Cidade</th>
-                        <th>Status</th>
-                        <th>Mensalidade</th>
-                        <th>Vencimento</th>
+                        <th class="sortable" onclick="sortTable(1, 'banco')">
+                            Banco <span class="sort-indicator" id="sort-banco"></span>
+                        </th>
+                        <th class="sortable" onclick="sortTable(2, 'idloja')">
+                            ID Loja <span class="sort-indicator" id="sort-idloja"></span>
+                        </th>
+                        <th class="sortable" onclick="sortTable(3, 'loja')">
+                            Loja <span class="sort-indicator" id="sort-loja"></span>
+                        </th>
+                        <th class="sortable" onclick="sortTable(4, 'razaosocial')">
+                            Razão Social <span class="sort-indicator" id="sort-razaosocial"></span>
+                        </th>
+                        <th class="sortable" onclick="sortTable(5, 'cnpj')">
+                            CNPJ <span class="sort-indicator" id="sort-cnpj"></span>
+                        </th>
+                        <th class="sortable" onclick="sortTable(6, 'status')">
+                            Status <span class="sort-indicator" id="sort-status"></span>
+                        </th>
+                        <th class="sortable" onclick="sortTable(7, 'mensalidade')">
+                            Mensalidade <span class="sort-indicator" id="sort-mensalidade"></span>
+                        </th>
+                        <th class="sortable" onclick="sortTable(8, 'vencimento')">
+                            Vencimento <span class="sort-indicator" id="sort-vencimento"></span>
+                        </th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -372,7 +478,15 @@
         async function carregarLojas() {
             try {
                 showLoading(true);
-                const response = await fetch('/lojas');
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/lojas', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
                 const data = await response.json();
 
                 if (data.success) {
@@ -439,25 +553,24 @@
                                value="${loja.banco}-${loja.idloja}" 
                                onchange="toggleLojaSelection('${loja.banco}', ${loja.idloja})">
                     </td>
-                    <td>${loja.id || '-'}</td>
                     <td>${loja.banco || '-'}</td>
                     <td>${loja.idloja || '-'}</td>
-                    <td>${loja.loja || loja.nome || loja.fantasia || '-'}</td>
+                    <td>${loja.loja || loja.fantasia || loja.nome || '-'}</td>
+                    <td>${loja.nome || '-'}</td>
                     <td>${loja.cnpj || '-'}</td>
-                    <td>${loja.cidade || '-'}</td>
                     <td>
-                        <span style="color: ${loja.status === 1 ? '#28a745' : '#dc3545'};">
-                            ${loja.status === 1 ? '✅ Ativo' : '❌ Inativo'}
+                        <span style="color: ${loja.status == 1 || loja.status === '1' ? '#28a745' : '#dc3545'};">
+                            ${loja.status == 1 || loja.status === '1' ? '✅ Ativo' : '❌ Inativo'}
                         </span>
                     </td>
-                    <td>${loja.mensalidade ? 'R$ ' + parseFloat(loja.mensalidade).toFixed(2) : '-'}</td>
-                    <td>${loja.vencimento || '-'}</td>
+                    <td>${(loja.mensalidade !== null && loja.mensalidade !== undefined && loja.mensalidade !== '') ? ('R$ ' + Number(loja.mensalidade).toFixed(2)) : '-'}</td>
+                    <td>${(loja.vencimento && loja.vencimento !== '0000-00-00') ? loja.vencimento : '-'}</td>
                     <td>
                         <div class="actions">
                             <button class="btn btn-warning btn-sm" onclick="editarLoja('${loja.banco}', ${loja.idloja})">
                                 ✏️ Editar
                             </button>
-                            <button class="btn btn-danger btn-sm" onclick="excluirLoja('${loja.banco}', ${loja.idloja}, '${loja.loja || loja.nome || 'Loja'}')">
+                            <button class="btn btn-danger btn-sm" onclick="excluirLoja('${loja.banco}', ${loja.idloja}, '${loja.loja || loja.nome || loja.fantasia || 'Loja'}')">
                                 🗑️ Excluir
                             </button>
                         </div>
@@ -523,8 +636,14 @@
             }
 
             try {
+                const token = localStorage.getItem('authToken');
                 const response = await fetch(`/lojas/${encodeURIComponent(banco)}/${idloja}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
                 });
 
                 const data = await response.json();
@@ -628,6 +747,159 @@
             setTimeout(() => {
                 alert.remove();
             }, 5000);
+        }
+
+        // Função para ordenação da tabela
+        let sortDirection = {};
+        
+        function sortTable(columnIndex, columnName) {
+            const table = document.getElementById('lojasTable');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            // Determinar direção da ordenação
+            const currentDirection = sortDirection[columnName] || 'asc';
+            const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            sortDirection[columnName] = newDirection;
+            
+            // Limpar indicadores anteriores
+            document.querySelectorAll('.sort-indicator').forEach(indicator => {
+                indicator.className = 'sort-indicator';
+            });
+            
+            // Adicionar indicador atual usando ID
+            const currentIndicator = document.getElementById(`sort-${columnName}`);
+            if (currentIndicator) {
+                currentIndicator.className = `sort-indicator ${newDirection}`;
+            }
+            
+            // Ordenar as linhas
+            rows.sort((a, b) => {
+                const aValue = a.cells[columnIndex].textContent.trim();
+                const bValue = b.cells[columnIndex].textContent.trim();
+                
+                // Verificar se são números
+                const aNum = parseFloat(aValue.replace(/[^\d.-]/g, ''));
+                const bNum = parseFloat(bValue.replace(/[^\d.-]/g, ''));
+                
+                let comparison = 0;
+                
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    // Comparação numérica
+                    comparison = aNum - bNum;
+                } else {
+                    // Comparação de string
+                    comparison = aValue.localeCompare(bValue, 'pt-BR', { numeric: true });
+                }
+                
+                return newDirection === 'asc' ? comparison : -comparison;
+            });
+            
+            // Reordenar as linhas na tabela
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Função para alternar tema
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                body.removeAttribute('data-theme');
+                themeToggle.innerHTML = '🌙 Tema Escuro';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '☀️ Tema Claro';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Carregar tema salvo ao inicializar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.getElementById('themeToggle');
+            
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '☀️ Tema Claro';
+            } else {
+                themeToggle.innerHTML = '🌙 Tema Escuro';
+            }
+            
+            // Verificar autenticação ao carregar a página
+            checkAuthentication();
+        });
+
+        // Função para verificar autenticação
+        async function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await fetch('/auth/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token inválido');
+                }
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error('Usuário não autenticado');
+                }
+
+                // Usuário autenticado, mostrar informações do usuário
+                displayUserInfo(data.user);
+            } catch (error) {
+                console.error('Erro de autenticação:', error);
+                localStorage.removeItem('authToken');
+                redirectToLogin();
+            }
+        }
+
+        // Função para mostrar informações do usuário
+        function displayUserInfo(user) {
+            // Adicionar informações do usuário no cabeçalho se necessário
+            console.log('Usuário logado:', user);
+        }
+
+        // Função para redirecionar para login
+        function redirectToLogin() {
+            window.location.href = '/login';
+        }
+
+        // Função para fazer logout
+        async function logout() {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                if (token) {
+                    await fetch('/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Erro no logout:', error);
+            } finally {
+                localStorage.removeItem('authToken');
+                redirectToLogin();
+            }
         }
     </script>
 </body>

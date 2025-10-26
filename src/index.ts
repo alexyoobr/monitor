@@ -4,9 +4,77 @@ import { tasksRouter } from "./endpoints/tasks/router";
 import { lojasRouter } from "./endpoints/lojas/router";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
+import { jwt, sign, verify } from "hono/jwt";
+
+// JWT Secret - In production, this should be in environment variables
+const JWT_SECRET = "your-super-secret-jwt-key-change-in-production";
 
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
+
+// Authentication middleware
+const authMiddleware = async (c: any, next: any) => {
+  const authHeader = c.req.header('Authorization');
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return c.json({ success: false, message: 'Token de acesso requerido' }, 401);
+  }
+
+  const token = authHeader.substring(7);
+  
+  try {
+    const payload = await verify(token, JWT_SECRET);
+    c.set('user', payload);
+    await next();
+  } catch (error) {
+    return c.json({ success: false, message: 'Token inválido' }, 401);
+  }
+};
+
+// Check if user is authenticated (for protected routes)
+const requireAuth = async (c: any, next: any) => {
+  const authHeader = c.req.header('Authorization');
+  const cookieToken = c.req.header('Cookie')?.match(/authToken=([^;]+)/)?.[1];
+  
+  const token = authHeader?.substring(7) || cookieToken;
+  
+  if (!token) {
+    // Se for uma requisição AJAX/fetch, retornar JSON ao invés de redirecionar
+    const acceptHeader = c.req.header('Accept');
+    if (acceptHeader && acceptHeader.includes('application/json')) {
+      return c.json({ success: false, message: 'Token de acesso requerido' }, 401);
+    }
+    
+    // Para requisições de navegação normal, servir a página mas com JavaScript que verifica autenticação
+    const url = new URL(c.req.url);
+    if (url.pathname === '/admin' || url.pathname === '/admin/cadastro') {
+      await next();
+      return;
+    }
+    
+    return c.redirect('/login');
+  }
+
+  try {
+    await verify(token, JWT_SECRET);
+    await next();
+  } catch (error) {
+    // Se for uma requisição AJAX/fetch, retornar JSON ao invés de redirecionar
+    const acceptHeader = c.req.header('Accept');
+    if (acceptHeader && acceptHeader.includes('application/json')) {
+      return c.json({ success: false, message: 'Token inválido' }, 401);
+    }
+    
+    // Para requisições de navegação normal, servir a página mas com JavaScript que verifica autenticação
+    const url = new URL(c.req.url);
+    if (url.pathname === '/admin' || url.pathname === '/admin/cadastro') {
+      await next();
+      return;
+    }
+    
+    return c.redirect('/login');
+  }
+};
 
 app.onError((err, c) => {
   if (err instanceof ApiException) {
@@ -42,8 +110,56 @@ app.get("/dashboard", async (c) => {
   return c.html("<h1>Dashboard não encontrado</h1>");
 });
 
-// Servir a página de admin (listagem de lojas)
-app.get("/admin", async (c) => {
+// Servir a página de login
+app.get("/login", async (c) => {
+  const asset = await c.env.ASSETS.get("login.html");
+  if (asset) {
+    return new Response(asset, {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+      },
+    });
+  }
+  return c.html("<h1>Página de login não encontrada</h1>");
+});
+
+// Endpoint para autenticação tradicional (email/password)
+app.post("/auth/login", async (c) => {
+  const { email, password } = await c.req.json();
+  
+  // Validação simples - em produção, verificar contra banco de dados
+  if (email === "admin@example.com" && password === "admin123") {
+    const payload = {
+      email: email,
+      role: "admin",
+      exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24), // 24 horas
+    };
+    
+    const token = await sign(payload, JWT_SECRET);
+    
+    return c.json({
+      success: true,
+      token: token,
+      user: { email: email, role: "admin" }
+    });
+  }
+  
+  return c.json({ success: false, message: "Credenciais inválidas" }, 401);
+});
+
+// Endpoint para logout
+app.post("/auth/logout", (c) => {
+  return c.json({ success: true, message: "Logout realizado com sucesso" });
+});
+
+// Endpoint para verificar se o usuário está autenticado
+app.get("/auth/me", authMiddleware, (c) => {
+  const user = c.get('user');
+  return c.json({ success: true, user: user });
+});
+
+// Servir a página de admin (listagem de lojas) - PROTEGIDA
+app.get("/admin", requireAuth, async (c) => {
   const asset = await c.env.ASSETS.get("admin.html");
   if (asset) {
     return new Response(asset, {
@@ -55,8 +171,8 @@ app.get("/admin", async (c) => {
   return c.html("<h1>Página de admin não encontrada</h1>");
 });
 
-// Servir a página de cadastro de loja
-app.get("/admin/cadastro", async (c) => {
+// Servir a página de cadastro de loja - PROTEGIDA
+app.get("/admin/cadastro", requireAuth, async (c) => {
   try {
     // Tentar usar o método fetch para acessar o arquivo diretamente
     const response = await fetch(new URL("../public/admin-cadastro.html", import.meta.url));

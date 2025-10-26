@@ -629,7 +629,15 @@
             }
             
             try {
-                const response = await fetch('/lojas?limit=10000');
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/lojas?limit=10000', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
                 let data;
                 if (response.ok) {
                     data = await response.json();

@@ -5,46 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="pageTitle">Cadastro de Loja - Admin</title>
     <style>
+        :root {
+            /* Light theme variables */
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-container: white;
+            --bg-card: white;
+            --bg-section: white;
+            --text-primary: #333;
+            --text-secondary: #555;
+            --text-muted: #666;
+            --border-color: #ddd;
+            --border-section: #e0e0e0;
+            --accent-color: #007bff;
+            --accent-hover: #0056b3;
+            --shadow-color: rgba(0,0,0,0.1);
+            --success-bg: #d4edda;
+            --success-border: #c3e6cb;
+            --success-text: #155724;
+            --success-color: #28a745;
+            --error-bg: #f8d7da;
+            --error-border: #f5c6cb;
+            --error-text: #721c24;
+            --error-color: #dc3545;
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme variables */
+            --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --bg-container: #2d3748;
+            --bg-card: #1a202c;
+            --bg-section: #1a202c;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --text-muted: #718096;
+            --border-color: #4a5568;
+            --border-section: #4a5568;
+            --accent-color: #4299e1;
+            --accent-hover: #3182ce;
+            --shadow-color: rgba(0,0,0,0.3);
+            --success-bg: #2d5a3d;
+            --success-border: #38a169;
+            --success-text: #9ae6b4;
+            --success-color: #38a169;
+            --error-bg: #742a2a;
+            --error-border: #e53e3e;
+            --error-text: #feb2b2;
+            --error-color: #e53e3e;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: white;
+            background-color: var(--bg-container);
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px var(--shadow-color);
         }
         h1 {
-            color: #333;
+            color: var(--text-primary);
             text-align: center;
             margin-bottom: 30px;
         }
         .form-section {
             margin-bottom: 30px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-section);
             border-radius: 6px;
             padding: 20px;
+            background-color: var(--bg-section);
         }
         .form-section h3 {
             margin-top: 0;
-            color: #555;
-            border-bottom: 2px solid #007bff;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--accent-color);
             padding-bottom: 10px;
         }
         .form-row {
             display: flex;
             gap: 15px;
             margin-bottom: 15px;
+            flex-wrap: nowrap;
+            align-items: flex-start;
         }
         .form-group {
             flex: 1;
             display: flex;
             flex-direction: column;
+            min-width: 0;
+            width: 50%;
         }
         .form-group.full-width {
             flex: 100%;
@@ -52,7 +106,7 @@
         .form-group label {
             margin-bottom: 5px;
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
         }
         .form-group label.required::after {
             content: " *";
@@ -62,28 +116,34 @@
         .form-group select,
         .form-group textarea {
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 14px;
+            background-color: var(--bg-container);
+            color: var(--text-primary);
         }
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 5px rgba(66, 153, 225, 0.3);
         }
         .form-group textarea {
             resize: vertical;
             min-height: 80px;
         }
         .btn-container {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
             margin-top: 30px;
+            flex-wrap: wrap;
         }
         .btn {
             padding: 12px 30px;
-            margin: 0 10px;
+            margin: 0;
             border: none;
             border-radius: 4px;
             font-size: 16px;
@@ -91,18 +151,18 @@
             transition: background-color 0.3s;
         }
         .btn-primary {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
             color: white;
         }
         .btn-primary:hover {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #3182ce, #2c5aa0);
         }
         .btn-secondary {
-            background-color: #6c757d;
+            background-color: var(--text-muted);
             color: white;
         }
         .btn-secondary:hover {
-            background-color: #545b62;
+            background-color: var(--text-secondary);
         }
         .alert {
             padding: 15px;
@@ -112,25 +172,74 @@
             display: none;
         }
         .alert-success {
-            color: #155724;
-            background-color: #d4edda;
-            border-color: #c3e6cb;
+            color: var(--success-text);
+            background-color: var(--success-bg);
+            border-color: var(--success-border);
         }
         .alert-error {
-            color: #721c24;
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
+            color: var(--error-text);
+            background-color: var(--error-bg);
+            border-color: var(--error-border);
         }
         .loading {
             display: none;
             text-align: center;
-            color: #666;
+            color: var(--text-muted);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .header-container h1 {
+            margin: 0;
+            color: var(--text-primary);
+            flex: 1;
+        }
+        
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            font-weight: 500;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--accent-color);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px var(--shadow-color);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 id="pageHeader">🏪 Cadastro de Loja</h1>
+        <div class="header-container">
+            <h1 id="pageHeader">🏪 Cadastro de Loja</h1>
+            <div class="header-buttons">
+                <button id="themeToggle" class="btn btn-secondary theme-toggle" onclick="toggleTheme()">
+                    🌙 Tema Escuro
+                </button>
+                <button id="logoutBtn" class="btn btn-danger theme-toggle" onclick="logout()">
+                    🚪 Sair
+                </button>
+            </div>
+        </div>
         
         <div id="alert" class="alert"></div>
         <div id="loading" class="loading">Salvando loja...</div>
@@ -171,6 +280,18 @@
                             <option value="1">Ativo</option>
                             <option value="0">Inativo</option>
                         </select>
+                    </div>
+                </div>
+                
+                <!-- Seção: Mensalidade e Vencimento -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mensalidade">Mensalidade</label>
+                        <input type="number" id="mensalidade" name="mensalidade" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="vencimento">Vencimento</label>
+                        <input type="date" id="vencimento" name="vencimento">
                     </div>
                 </div>
             </div>
@@ -351,10 +472,6 @@
                         <label for="estadual">Estadual (%)</label>
                         <input type="number" id="estadual" name="estadual" step="0.01" min="0" max="100">
                     </div>
-                    <div class="form-group">
-                        <label for="mensalidade">Mensalidade</label>
-                        <input type="number" id="mensalidade" name="mensalidade" step="0.01" min="0">
-                    </div>
                 </div>
             </div>
 
@@ -416,8 +533,16 @@
             try {
                 mostrarLoading(true);
                 
+                const token = localStorage.getItem('authToken');
                 const url = `/lojas/${encodeURIComponent(banco)}/${idloja}`;
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
                 const result = await response.json();
                 
                 if (response.ok && result.success) {
@@ -457,14 +582,42 @@
                 'telefone': 'telefone',
                 'email': 'email',
                 'site': 'site',
-                'observacoes': 'observacoes'
+                'observacoes': 'observacoes',
+                'mensalidade': 'mensalidade',
+                'vencimento': 'vencimento'
             };
 
             // Preencher campos do formulário
             for (const [campoApi, idElemento] of Object.entries(camposMapeados)) {
                 const elemento = document.getElementById(idElemento);
                 if (elemento && loja[campoApi] !== null && loja[campoApi] !== undefined) {
-                    elemento.value = loja[campoApi];
+                    console.log(`Preenchendo ${idElemento} com valor:`, loja[campoApi]);
+                    
+                    // Tratamento especial para campos select
+                    if (elemento.tagName === 'SELECT') {
+                        const valor = String(loja[campoApi]); // Converter para string
+                        elemento.value = valor;
+                        
+                        // Se não encontrou a opção, tentar definir manualmente
+                        if (elemento.value !== valor) {
+                            const opcoes = Array.from(elemento.options);
+                            const opcaoEncontrada = opcoes.find(opt => opt.value === valor);
+                            if (opcaoEncontrada) {
+                                opcaoEncontrada.selected = true;
+                            }
+                        }
+                        
+                        console.log(`Select ${idElemento} - Valor definido:`, elemento.value);
+                        console.log(`Select ${idElemento} - Opção selecionada:`, elemento.selectedOptions[0]?.text);
+                    } else {
+                        elemento.value = loja[campoApi];
+                    }
+                    
+                    // Log especial para o campo status
+                    if (idElemento === 'status') {
+                        console.log('Status após preenchimento:', elemento.value);
+                        console.log('Opções disponíveis:', Array.from(elemento.options).map(opt => ({value: opt.value, text: opt.text, selected: opt.selected})));
+                    }
                 }
             }
 
@@ -477,6 +630,7 @@
 
         // Função para voltar à listagem
         function voltarParaListagem() {
+            console.log('voltarParaListagem chamada - redirecionando para /admin');
             window.location.href = '/admin';
         }
 
@@ -493,14 +647,25 @@
         }
         // Função para mostrar alertas
         function mostrarAlerta(mensagem, tipo) {
+            console.log('mostrarAlerta chamada:', mensagem, tipo);
             const alert = document.getElementById('alert');
+            console.log('Elemento alert encontrado:', alert);
+            
+            if (!alert) {
+                console.error('Elemento alert não encontrado!');
+                return;
+            }
+            
             alert.textContent = mensagem;
             alert.className = `alert alert-${tipo}`;
             alert.style.display = 'block';
             
+            console.log('Alert configurado:', alert.className, alert.style.display);
+            
             // Esconder após 5 segundos
             setTimeout(() => {
                 alert.style.display = 'none';
+                console.log('Alert escondido após 5 segundos');
             }, 5000);
         }
 
@@ -572,12 +737,15 @@
                 const dados = coletarDadosFormulario();
                 
                 let response;
+                const token = localStorage.getItem('authToken');
                 if (isEditMode) {
                     // Modo de edição - usar PUT
                     response = await fetch(`/lojas/${encodeURIComponent(editBanco)}/${editIdLoja}`, {
                         method: 'PUT',
                         headers: {
+                            'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         },
                         body: JSON.stringify(dados)
                     });
@@ -586,24 +754,32 @@
                     response = await fetch('/lojas', {
                         method: 'POST',
                         headers: {
+                            'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         },
                         body: JSON.stringify(dados)
                     });
                 }
                 
-                const result = await response.json();
+                let result;
+                try {
+                    result = await response.json();
+                } catch (e) {
+                    result = {};
+                }
                 
-                if (response.ok && result.success) {
+                console.log('Response status:', response.status);
+                console.log('Response result:', result);
+                
+                if (response.ok) {
                     const successMsg = isEditMode ? 'Loja atualizada com sucesso!' : 'Loja cadastrada com sucesso!';
                     mostrarAlerta(successMsg, 'success');
                     
-                    if (!isEditMode) {
-                        limparFormulario();
-                    }
-                    
-                    // Redirecionar para listagem após 2 segundos
+                    // Redirecionar para listagem após delay
+                    console.log('Agendando redirecionamento em 2 segundos...');
                     setTimeout(() => {
+                        console.log('Executando redirecionamento agora...');
                         voltarParaListagem();
                     }, 2000);
                 } else {
@@ -644,6 +820,97 @@
             value = value.replace(/(\d{4})(\d)/, '$1-$2');
             e.target.value = value;
         });
+
+        // Função para alternar tema
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeToggle.innerHTML = '🌙 Tema Escuro';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '☀️ Tema Claro';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Carregar tema salvo
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeToggle = document.getElementById('themeToggle');
+            
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '☀️ Tema Claro';
+            }
+            
+            // Verificar autenticação ao carregar a página
+            checkAuthentication();
+        });
+
+        // Função para verificar autenticação
+        async function checkAuthentication() {
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await fetch('/auth/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Token inválido');
+                }
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error('Usuário não autenticado');
+                }
+            } catch (error) {
+                console.error('Erro de autenticação:', error);
+                localStorage.removeItem('authToken');
+                redirectToLogin();
+            }
+        }
+
+        // Função para redirecionar para login
+        function redirectToLogin() {
+            window.location.href = '/login';
+        }
+
+        // Função para fazer logout
+        async function logout() {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                if (token) {
+                    await fetch('/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Erro no logout:', error);
+            } finally {
+                localStorage.removeItem('authToken');
+                redirectToLogin();
+            }
+        }
     </script>
 </body>
 </html>
