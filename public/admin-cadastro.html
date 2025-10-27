@@ -508,12 +508,16 @@
 
         // Detectar parâmetros da URL ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded - URL atual:', window.location.href);
             const urlParams = new URLSearchParams(window.location.search);
             const banco = urlParams.get('banco');
             const idloja = urlParams.get('idloja');
             const edit = urlParams.get('edit');
+            
+            console.log('Parâmetros da URL:', { edit, banco, idloja });
 
             if (edit === 'true' && banco && idloja) {
+                console.log('Entrando no modo de edição');
                 isEditMode = true;
                 editBanco = banco;
                 editIdLoja = parseInt(idloja);
@@ -525,6 +529,8 @@
                 
                 // Carregar dados da loja
                 carregarDadosLoja(banco, idloja);
+            } else {
+                console.log('Modo cadastro - parâmetros não atendem aos critérios para edição');
             }
         });
 

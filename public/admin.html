@@ -627,7 +627,7 @@
 
         function editarLoja(banco, idloja) {
             // Redirecionar para página de edição (pode ser a mesma de cadastro com parâmetros)
-            window.location.href = `/admin/cadastro?banco=${encodeURIComponent(banco)}&idloja=${idloja}&edit=true`;
+            window.location.href = `/admin-cadastro?banco=${encodeURIComponent(banco)}&idloja=${idloja}&edit=true`;
         }
 
         async function excluirLoja(banco, idloja, nomeLoja) {
