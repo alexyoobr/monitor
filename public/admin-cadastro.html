@@ -533,12 +533,10 @@
             try {
                 mostrarLoading(true);
                 
-                const token = localStorage.getItem('authToken');
                 const url = `/lojas/${encodeURIComponent(banco)}/${idloja}`;
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     }
@@ -737,13 +735,11 @@
                 const dados = coletarDadosFormulario();
                 
                 let response;
-                const token = localStorage.getItem('authToken');
                 if (isEditMode) {
                     // Modo de edição - usar PUT
                     response = await fetch(`/lojas/${encodeURIComponent(editBanco)}/${editIdLoja}`, {
                         method: 'PUT',
                         headers: {
-                            'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         },
@@ -754,7 +750,6 @@
                     response = await fetch('/lojas', {
                         method: 'POST',
                         headers: {
-                            'Authorization': `Bearer ${token}`,
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         },
@@ -846,70 +841,13 @@
                 document.body.setAttribute('data-theme', 'dark');
                 themeToggle.innerHTML = '☀️ Tema Claro';
             }
-            
-            // Verificar autenticação ao carregar a página
-            checkAuthentication();
         });
 
-        // Função para verificar autenticação
-        async function checkAuthentication() {
-            const token = localStorage.getItem('authToken');
-            
-            if (!token) {
-                redirectToLogin();
-                return;
-            }
-
-            try {
-                const response = await fetch('/auth/me', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Token inválido');
-                }
-
-                const data = await response.json();
-                if (!data.success) {
-                    throw new Error('Usuário não autenticado');
-                }
-            } catch (error) {
-                console.error('Erro de autenticação:', error);
-                localStorage.removeItem('authToken');
-                redirectToLogin();
-            }
-        }
-
-        // Função para redirecionar para login
-        function redirectToLogin() {
-            window.location.href = '/login';
-        }
-
-        // Função para fazer logout
+        // Função para fazer logout (removida a funcionalidade de autenticação)
         async function logout() {
-            try {
-                const token = localStorage.getItem('authToken');
-                
-                if (token) {
-                    await fetch('/auth/logout', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('Erro no logout:', error);
-            } finally {
-                localStorage.removeItem('authToken');
-                redirectToLogin();
-            }
+            // Apenas limpar dados locais e redirecionar
+            localStorage.clear();
+            window.location.href = '/login';
         }
     </script>
 </body>

@@ -827,79 +827,13 @@
             } else {
                 themeToggle.innerHTML = '🌙 Tema Escuro';
             }
-            
-            // Verificar autenticação ao carregar a página
-            checkAuthentication();
         });
 
-        // Função para verificar autenticação
-        async function checkAuthentication() {
-            const token = localStorage.getItem('authToken');
-            
-            if (!token) {
-                redirectToLogin();
-                return;
-            }
-
-            try {
-                const response = await fetch('/auth/me', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Token inválido');
-                }
-
-                const data = await response.json();
-                if (!data.success) {
-                    throw new Error('Usuário não autenticado');
-                }
-
-                // Usuário autenticado, mostrar informações do usuário
-                displayUserInfo(data.user);
-            } catch (error) {
-                console.error('Erro de autenticação:', error);
-                localStorage.removeItem('authToken');
-                redirectToLogin();
-            }
-        }
-
-        // Função para mostrar informações do usuário
-        function displayUserInfo(user) {
-            // Adicionar informações do usuário no cabeçalho se necessário
-            console.log('Usuário logado:', user);
-        }
-
-        // Função para redirecionar para login
-        function redirectToLogin() {
-            window.location.href = '/login';
-        }
-
-        // Função para fazer logout
+        // Função para fazer logout (removida a funcionalidade de autenticação)
         async function logout() {
-            try {
-                const token = localStorage.getItem('authToken');
-                
-                if (token) {
-                    await fetch('/auth/logout', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('Erro no logout:', error);
-            } finally {
-                localStorage.removeItem('authToken');
-                redirectToLogin();
-            }
+            // Apenas limpar dados locais e redirecionar
+            localStorage.clear();
+            window.location.href = '/login';
         }
     </script>
 </body>
