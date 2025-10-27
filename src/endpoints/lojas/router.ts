@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { fromHono } from "chanfana";
 import { LojaList } from "./lojaList";
+import { LojaListDashboard } from "./lojaListDashboard";
 import { LojaCreate } from "./lojaCreate";
 import { LojaRead } from "./lojaRead";
 import { LojaUpdate } from "./lojaUpdate";
@@ -10,6 +11,7 @@ import { LojaSeed } from "./lojaSeed";
 export const lojasRouter = fromHono(new Hono());
 
 lojasRouter.get("/", LojaList);
+lojasRouter.get("/dashboard", LojaListDashboard);
 lojasRouter.post("/", LojaCreate);
 // Seed endpoint for local visualization
 lojasRouter.get("/seed", LojaSeed);

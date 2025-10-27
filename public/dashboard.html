@@ -630,7 +630,7 @@
             
             try {
                 const token = localStorage.getItem('authToken');
-                const response = await fetch('/lojas?limit=10000', {
+                const response = await fetch('/lojas/dashboard?limit=10000', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
