@@ -407,7 +407,7 @@
                 <input type="text" 
                        id="filterInput" 
                        class="filter-input" 
-                       placeholder="🔍 Buscar por banco, loja, CNPJ ou nome..."
+                       placeholder="🔍 Buscar por banco ou loja..."
                        oninput="filtrarLojas()">
                 <button class="clear-filter" onclick="limparFiltro()">
                     ✕ Limpar
@@ -540,13 +540,9 @@
                     if (filtro !== '') {
                         const banco = (loja.banco || '').toLowerCase();
                         const nomeLoja = (loja.loja || loja.nome || loja.fantasia || '').toLowerCase();
-                        const cnpj = (loja.cnpj || '').replace(/[^\d]/g, ''); // Remove formatação do CNPJ
-                        const filtroLimpo = filtro.replace(/[^\d]/g, ''); // Remove formatação do filtro para CNPJ
                         
                         passaFiltroTexto = banco.includes(filtro) ||
-                                         nomeLoja.includes(filtro) ||
-                                         cnpj.includes(filtroLimpo) ||
-                                         (loja.idloja && loja.idloja.toString().includes(filtro));
+                                         nomeLoja.includes(filtro);
                     }
                     
                     // Filtro por status ativo
@@ -611,7 +607,7 @@
                         </span>
                     </td>
                     <td>${(loja.mensalidade !== null && loja.mensalidade !== undefined && loja.mensalidade !== '') ? ('R$ ' + Number(loja.mensalidade).toFixed(2)) : '-'}</td>
-                    <td>${(loja.vencimento && loja.vencimento !== '0000-00-00') ? loja.vencimento : '-'}</td>
+                    <td>${formatarDataBrasileira(loja.vencimento)}</td>
                     <td>
                         <div class="actions">
                             <button class="btn btn-warning btn-sm" onclick="editarLoja('${loja.banco}', ${loja.idloja})">
@@ -875,6 +871,31 @@
                 themeToggle.innerHTML = '🌙 Tema Escuro';
             }
         });
+
+        // Função para formatar data do formato ISO (YYYY-MM-DD) para formato brasileiro (DD/MM/YYYY)
+        function formatarDataBrasileira(dataISO) {
+            if (!dataISO || dataISO === '0000-00-00' || dataISO === '') {
+                return '-';
+            }
+            
+            try {
+                // Dividir a data ISO (YYYY-MM-DD)
+                const partes = dataISO.split('-');
+                if (partes.length !== 3) {
+                    return dataISO; // Retorna original se não conseguir processar
+                }
+                
+                const ano = partes[0];
+                const mes = partes[1];
+                const dia = partes[2];
+                
+                // Retornar no formato brasileiro (DD/MM/YYYY)
+                return `${dia}/${mes}/${ano}`;
+            } catch (error) {
+                console.error('Erro ao formatar data:', error);
+                return dataISO; // Retorna original em caso de erro
+            }
+        }
 
         // Função para fazer logout (removida a funcionalidade de autenticação)
         async function logout() {
