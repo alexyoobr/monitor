@@ -736,22 +736,24 @@
             }
 
             const count = selectedLojas.size;
-            if (!confirm(`Atualizar o vencimento para o dia 10 do próximo mês para ${count} loja${count > 1 ? 's' : ''} selecionada${count > 1 ? 's' : ''}?`)) {
+            if (!confirm(`Somar 1 mês ao vencimento atual para ${count} loja${count > 1 ? 's' : ''} selecionada${count > 1 ? 's' : ''} (mantendo o dia)?`)) {
                 return;
             }
 
             try {
-                // Calcular data do próximo mês, dia 10
-                const proximoMes = new Date();
-                proximoMes.setMonth(proximoMes.getMonth() + 1);
-                proximoMes.setDate(10);
-                const novoVencimento = proximoMes.toISOString().split('T')[0]; // YYYY-MM-DD
-
                 let sucessos = 0;
                 let erros = 0;
 
                 for (const lojaKey of selectedLojas) {
                     const [banco, idloja] = lojaKey.split('-');
+                    const lojaAtual = lojas.find(l => String(l.banco) === banco && String(l.idloja) === String(idloja));
+                    const vencAtual = lojaAtual?.vencimento;
+                    const novoVencimento = adicionarUmMesMantendoDia(vencAtual);
+                    if (!novoVencimento) {
+                        erros++;
+                        console.error(`Loja ${banco}-${idloja} sem vencimento válido para atualizar. Valor atual:`, vencAtual);
+                        continue;
+                    }
                     
                     try {
                         const response = await fetch(`/lojas/${encodeURIComponent(banco)}/${idloja}`, {
@@ -779,7 +781,7 @@
                 }
 
                 if (sucessos > 0) {
-                    showAlert(`${sucessos} loja${sucessos > 1 ? 's' : ''} atualizada${sucessos > 1 ? 's' : ''} com sucesso! Vencimento definido para ${novoVencimento}.`, 'success');
+                    showAlert(`${sucessos} loja${sucessos > 1 ? 's' : ''} atualizada${sucessos > 1 ? 's' : ''} com sucesso! Vencimento somado em 1 mês (dia mantido).`, 'success');
                 }
                 
                 if (erros > 0) {
@@ -897,6 +899,35 @@
                 themeToggle.innerHTML = '🌙 Tema Escuro';
             }
         });
+
+        // Utilitário: soma um mês mantendo o dia (retorna ISO YYYY-MM-DD)
+        function adicionarUmMesMantendoDia(dataISO) {
+            try {
+                if (!dataISO || dataISO === '0000-00-00' || dataISO === '') {
+                    return null;
+                }
+                const [anoStr, mesStr, diaStr] = dataISO.split('-');
+                let ano = parseInt(anoStr, 10);
+                let mes = parseInt(mesStr, 10); // 1-12
+                let dia = parseInt(diaStr, 10);
+                if (isNaN(ano) || isNaN(mes) || isNaN(dia)) return null;
+
+                // avançar um mês
+                mes += 1;
+                if (mes > 12) { mes = 1; ano += 1; }
+
+                // dias no mês alvo
+                const diasNoMesAlvo = new Date(ano, mes, 0).getDate(); // usando Date(ano, mes, 0) pega último dia do mês (mes é 1-12 aqui)
+                const diaAjustado = Math.min(dia, diasNoMesAlvo);
+
+                const mm = String(mes).padStart(2, '0');
+                const dd = String(diaAjustado).padStart(2, '0');
+                return `${ano}-${mm}-${dd}`;
+            } catch (e) {
+                console.error('Erro em adicionarUmMesMantendoDia:', e, dataISO);
+                return null;
+            }
+        }
 
         // Função para formatar data do formato ISO (YYYY-MM-DD) para formato brasileiro (DD/MM/YYYY)
         function formatarDataBrasileira(dataISO) {
