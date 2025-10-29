@@ -489,9 +489,19 @@
         let lojas = [];
         let lojasFiltradas = [];
         let selectedLojas = new Set();
+        const STORAGE_FILTER_TEXT = 'admin_filter_text';
+        const STORAGE_FILTER_ACTIVE = 'admin_filter_active';
 
         // Carregar lojas ao inicializar a página
         document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const inputEl = document.getElementById('filterInput');
+                const statusEl = document.getElementById('statusAtivoFilter');
+                const savedText = localStorage.getItem(STORAGE_FILTER_TEXT) || '';
+                const savedActive = localStorage.getItem(STORAGE_FILTER_ACTIVE);
+                if (inputEl) inputEl.value = savedText;
+                if (statusEl) statusEl.checked = savedActive === '1' || savedActive === 'true';
+            } catch (_) {}
             carregarLojas();
         });
 
@@ -511,8 +521,15 @@
 
                 if (data.success) {
                     lojas = data.result;
-                    lojasFiltradas = [...lojas]; // Cópia inicial
-                    renderizarTabela();
+                    const inputEl = document.getElementById('filterInput');
+                    const statusEl = document.getElementById('statusAtivoFilter');
+                    const hasFilter = (inputEl && inputEl.value.trim() !== '') || (statusEl && statusEl.checked);
+                    if (hasFilter) {
+                        filtrarLojas();
+                    } else {
+                        lojasFiltradas = [...lojas]; // Cópia inicial
+                        renderizarTabela();
+                    }
                     showAlert('Lojas carregadas com sucesso!', 'success');
                 } else {
                     throw new Error('Erro ao carregar lojas');
@@ -526,8 +543,13 @@
         }
 
         function filtrarLojas() {
-            const filtro = document.getElementById('filterInput').value.toLowerCase().trim();
+            const filtroRaw = document.getElementById('filterInput').value;
+            const filtro = filtroRaw.toLowerCase().trim();
             const statusAtivoChecked = document.getElementById('statusAtivoFilter').checked;
+            try {
+                localStorage.setItem(STORAGE_FILTER_TEXT, filtroRaw);
+                localStorage.setItem(STORAGE_FILTER_ACTIVE, statusAtivoChecked ? '1' : '0');
+            } catch (_) {}
             
             console.log('Filtro de status ativo:', statusAtivoChecked);
             
@@ -580,6 +602,10 @@
         function limparFiltro() {
             document.getElementById('filterInput').value = '';
             document.getElementById('statusAtivoFilter').checked = false;
+            try {
+                localStorage.removeItem(STORAGE_FILTER_TEXT);
+                localStorage.removeItem(STORAGE_FILTER_ACTIVE);
+            } catch (_) {}
             lojasFiltradas = [...lojas];
             renderizarTabela();
         }
