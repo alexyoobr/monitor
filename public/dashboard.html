@@ -127,6 +127,9 @@
             white-space: nowrap;
             min-width: 80px;
         }
+        /* Colunas fixas à esquerda (sticky) */
+        thead th.sticky-col { position: sticky; left: 0; z-index: 6; }
+        tbody td.sticky-col { position: sticky; left: 0; z-index: 4; background: inherit; background-clip: padding-box; }
         th {
             background-color: #7a82ff;
             color: white;
@@ -298,6 +301,8 @@
             body.dark .table-container::-webkit-scrollbar-thumb:hover {
                 background: #3c4a5e;
             }
+            /* Ajustes tema escuro para colunas fixas */
+            body.dark tbody td.sticky-col { background: inherit; }
             /* Painel de colunas */
             .columns-panel {
                 display: none;
@@ -401,6 +406,7 @@
         const STORAGE_ORDER = 'dashboard.columnsOrder';
         const STORAGE_VISIBLE = 'dashboard.visibleColumns';
         const STORAGE_WIDTHS = 'dashboard.columnWidths';
+        const STICKY_KEYS = ['ipvpn','banco','idloja','loja'];
         let columnsOrder = [];
         let visibleColumns = new Set();
         let columnWidths = {};
@@ -448,6 +454,10 @@
             th.textContent = col ? col.label : key;
             // aplicar largura persistida
             if (columnWidths[key]) th.style.width = columnWidths[key] + 'px';
+            // marcar colunas fixas
+            if (STICKY_KEYS.includes(key)) {
+              th.classList.add('sticky-col');
+            }
             const span = document.createElement('span');
             span.className = 'sort-indicator';
             th.appendChild(document.createTextNode(' '));
@@ -477,6 +487,8 @@
                     if (cell) cell.style.width = newWidth + 'px';
                   });
                 }
+                // atualizar offsets das colunas fixas durante resize
+                applyStickyOffsets();
               };
               const onMouseUp = () => {
                 isResizing = false;
@@ -487,6 +499,8 @@
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
                 try { localStorage.setItem(STORAGE_WIDTHS, JSON.stringify(columnWidths)); } catch (_) {}
+                // garantir offsets finais
+                applyStickyOffsets();
               };
               document.addEventListener('mousemove', onMouseMove);
               document.addEventListener('mouseup', onMouseUp);
@@ -499,6 +513,8 @@
           setupSorting();
           enableHeaderDrag();
           updateSortIndicators();
+          // aplicar offsets para colunas fixas
+          applyStickyOffsets();
         }
         function enableHeaderDrag() {
           const headers = document.querySelectorAll('#lojasTable thead th.sortable');
@@ -711,13 +727,17 @@
                   if (numericKeys.has(key)) {
                     const v = loja[key];
                     const td = document.createElement('td');
+                    td.dataset.key = key;
                     td.textContent = (v !== undefined && v !== null) ? String(v) : '';
                     if (columnWidths[key]) td.style.width = columnWidths[key] + 'px';
+                    if (STICKY_KEYS.includes(key)) td.classList.add('sticky-col');
                     row.appendChild(td);
                   } else {
                     const td = document.createElement('td');
+                    td.dataset.key = key;
                     td.textContent = loja[key] || '';
                     if (columnWidths[key]) td.style.width = columnWidths[key] + 'px';
+                    if (STICKY_KEYS.includes(key)) td.classList.add('sticky-col');
                     row.appendChild(td);
                   }
                 });
@@ -751,6 +771,41 @@
                     }
                 }
                 tableBody.appendChild(row);
+            });
+            // aplicar offsets para colunas fixas após renderizar linhas
+            applyStickyOffsets();
+        }
+
+        // Aplicar offsets dinâmicos para colunas fixas com base na ordem visível
+        function applyStickyOffsets() {
+            const theadRow = document.getElementById('lojasHeaderRow');
+            if (!theadRow) return;
+            // Ordem de chaves fixas conforme visibilidade e ordem atual
+            const stickyVisibleOrder = visibleKeysOrder.filter(k => STICKY_KEYS.includes(k));
+            // calcular larguras de cada coluna fixa
+            const widths = {};
+            stickyVisibleOrder.forEach(key => {
+              const th = Array.from(theadRow.children).find(el => el.dataset && el.dataset.key === key);
+              const w = th ? th.getBoundingClientRect().width : (columnWidths[key] || 120);
+              widths[key] = w;
+            });
+            // aplicar left cumulativo
+            let leftAccum = 0;
+            stickyVisibleOrder.forEach((key, idx) => {
+              const th = Array.from(theadRow.children).find(el => el.dataset && el.dataset.key === key);
+              if (th) {
+                th.style.left = leftAccum + 'px';
+              }
+              const colIndex = visibleKeysOrder.indexOf(key);
+              if (colIndex >= 0) {
+                document.querySelectorAll('#lojasTableBody tr').forEach(tr => {
+                  const cell = tr.children[colIndex];
+                  if (cell) {
+                    cell.style.left = leftAccum + 'px';
+                  }
+                });
+              }
+              leftAccum += widths[key] || 0;
             });
         }
         
